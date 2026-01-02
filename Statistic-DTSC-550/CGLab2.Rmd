@@ -1,0 +1,383 @@
+---
+title: 'DTSC 550: Intro to Statistical Modeling'
+subtitle: 'CG Lab 2 Template'
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+---
+
+# Student Info
+
+*Name:*
+
+*Term:*
+
+*Date:*
+
+------------------------------------------------------------------------
+
+# File Naming
+
+Name your file *`CGLab2`*. This file is a "notebook," which allows text and code mixed together. The file has the extension '.Rmd' stands for Rmarkdown.
+
+------------------------------------------------------------------------
+
+# Directions
+
+This file includes all the questions for this Code Grade (CG) Lab.
+
+You *must* type your code in this template in order for Code Grade to give you feedback on your code.
+
+------------------------------------------------------------------------
+
+## Adding Code Blocks
+
+You do not need to insert any new code blocks. If choose to, you can do so by clicking the button above with a green C and a plus sign. (There are other ways to insert code blocks, too)
+
+------------------------------------------------------------------------
+
+## Adding Comments
+
+You can add comments *within* a code block by using one or more `#`.
+
+------------------------------------------------------------------------
+
+## Allowable Packages
+
+The data for this lab is stored in the `airports` package. You will need to *`install.packages("airports")`* prior to loading the `library(airports)` in the cell block below. You can create a code block directly below or you can run the command in the console pane.
+
+For CodeGrade purposes, you must comment out any package installation code prior to submitting your assignment (ie: #install.packages("package_name"))
+**Important**: Do not install any other packages for this lab. Use only base R (built-in) functions.
+
+------------------------------------------------------------------------
+
+## Grading
+
+Your code will be graded automatically by Code Grade:
+
+-   It will test that there are no syntax errors in your code. If there are, you will need to correct these mistakes and re-submit your code.
+
+-   Next, it will check that your answers are consistent with what we're looking for.
+
+-   Lastly, it will check that you used the intended functions. This prevents hard-coded answers and ensures solutions are obtained strictly though your coding.
+
+------------------------------------------------------------------------
+
+## Cautions
+
+**Important**: Do not share or post your solutions to this lab anywhere online, as that would be considered plagiarism and carries academic consequences
+
+Do not “hard-code” any answers in this assignment. For example, suppose Question 0 asked to find the average of 10 and 20 and store it in Q0. You should have Q0 <- mean(c(10, 20)) for your answer, not Q0 <- 15.  In other words, you should be using functions (like “mean”)  to find answers, rather than storing the values (15) themselves. 
+
+The problem with hard-coding is that if the data changes, your answer will not change with it (and therefore it will be wrong). Using a function (like “mean”), on the other hand, will recalculate the mean regardless if the data changes. We want code that can handle to these types of changes If your code is found to have hard-coded answers, you may receive a 0% on the assignment.
+
+**Important**:
+
+Every coding language has its own style. Here are a few stylistic elements in R, but first an example of what to do and what not to do:
+
+Do this:
+```{r}
+Q1 <- head(data, 7)
+```
+
+Don't do this:
+```{r}
+Q1=head ( data,7 )
+```
+
+What are the differences? (There are a lot!)
+
+1. The assignment operator `<-` should be used, not `=`.
+
+2. Spaces should be used around the operator.
+
+3. A space should be used after a comma.
+
+4. Spaces should not be used after or before a `(` or `)`...or with an open or close bracket.
+
+5. We don't include a space after a function name.
+
+The **structure tests** on CodeGrade will look not only for hard coded answers, but also for for stylistic issues like the above.
+
+------------------------------------------------------------------------
+
+## Data Codebook
+
+Review this documentation on the [airports package](https://cran.r-project.org/web/packages/airports/airports.pdf)
+
+------------------------------------------------------------------------
+
+# Preliminaries
+
+The data for this lab is stored in the `airports` package. You will need to *`install.packages("airports")`* prior to running the following cell. You can create a code block directly below or you can run the command in the console pane.
+
+```{r}
+### It's always a good idea when working in RStudio to start with a clean environment. 
+
+### Clear objects from the environment memory that may be leftover from previous versions of your code or other assignments by running the following line:
+rm(list = ls())
+
+### Load Libraries
+
+suppressPackageStartupMessages(library(airports))
+```
+
+------------------------------------------------------------------------
+
+# Questions
+
+## Part 1
+
+The dataframe is called *`usairports`* within the airports package. Let's view the dataframe by running the following code block. Take some time to familiarize yourself with the columns and rows.
+
+```{r}
+usairports
+```
+
+### Q1: View the data in only the first 4 rows of the usairports dataframe. Store this result to a variable called Q1.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+## CG Q1 ##
+
+### TYPE YOUR CODE BELOW ###
+Q1 <- head(usairports,4)
+
+### VIEW OUTPUT ###
+Q1
+
+```
+
+### Q2: Assign the dimensions of the usairports dataset to a variable called Q2.
+
+Do not hard code the answer! That is, do not simply have `Q2 <- {a number}`
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q2 #
+
+### TYPE YOUR CODE BELOW ###
+Q2 <- dim(usairports)
+
+### VIEW OUTPUT ###
+Q2
+
+```
+
+### Q3: Store the last 5 rows of the usairports dataframe and view only columns 5, 6, & 7. Use indexing to access the requested columns. Store this result to a variable called Q3.
+
+For assistance with indexing, refer to this [article](https://www.geeksforgeeks.org/how-to-select-dataframe-columns-by-index-in-r/). Be careful, though, not to use the last approach, which utilizes the dplyr library. This lab does not allow the use of dplyr functions.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q3 #
+
+### TYPE YOUR CODE BELOW ###
+Q3 <- tail(usairports,5)[,5:7]
+
+### VIEW OUTPUT ###
+Q3
+
+```
+
+### Q4: Store the names of the first six variables in the usairports dataframe to Q4.
+
+Do not hard code the answer! That is, do not simply type the names of the columns.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q4 #
+
+### TYPE YOUR CODE BELOW ###
+
+Q4 <- names(usairports)[1:6]
+### VIEW OUTPUT ###
+Q4
+
+```
+
+### Q5: Store the number of columns (i.e., the number of variables) in the usairports dataframe to Q5.
+
+Do not hard code the answer! That is, do not simply have *`Q5 <- {a number}`*
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q5 #
+
+### TYPE YOUR CODE BELOW ###
+
+Q5 <- length(names(usairports))
+### VIEW OUTPUT ###
+Q5
+
+```
+
+### Q6: Use indexing to store the 3rd column name in the usairports data set to Q6.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q6 #
+
+### TYPE YOUR CODE BELOW ###
+Q6 <-names(usairports)[3]
+
+### VIEW OUTPUT ###
+Q6
+
+```
+
+### Q7: Store the values of the first 6 values of the `ownership` variable in the usairports dataframe to Q7. Use the `$` operator to access the values.
+
+For assistance with the `$` operator, see this [article](https://statisticsglobe.com/meaning-of-dollar-operator-in-r)
+
+Or, refer to the article ["How to Access Components of a Dataframe"](https://www.datamentor.io/r-programming/data-frame/)
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q7 #
+
+### TYPE YOUR CODE BELOW ###
+Q7 <- head(usairports$ownership, 6)
+
+### VIEW OUTPUT ###
+Q7
+
+```
+
+### Q8: Use the length function to store the number of rows of the ownership variable in the usairports data set. Store the value in Q8.
+
+Do not hard code the answer! That is, do not simply have `Q8 <- {a number}`
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q8 #
+
+### TYPE YOUR CODE BELOW ###
+Q8 <- length(usairports$ownership)
+
+### VIEW OUTPUT ###
+Q8
+
+```
+
+### Q9: Store the values of the ownership variable in a table and assign the table to Q9.
+
+Read this [documentation](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/table) for assistance.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q9 #
+
+### TYPE YOUR CODE BELOW ###
+
+Q9 <- table(usairports$ownership)
+
+### VIEW OUTPUT ###
+Q9
+
+```
+
+------------------------------------------------------------------------
+
+## Part 2
+
+### Q10: Create a vector with these names: Matthew, Mark, Luke, and John. Assign it to Q10.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q10 #
+
+### TYPE YOUR CODE BELOW ###
+Q10 <- c('Matthew', 'Mark', 'Luke','John')
+
+### VIEW OUTPUT ###
+Q10
+
+```
+
+### Q11: Create a vector with these valuees: 28, 16, 24, 21. Assign it to Q11.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q11 #
+
+### TYPE YOUR CODE BELOW ###
+Q11 <- c(28, 16, 24, 21)
+
+### VIEW OUTPUT ###
+Q11
+
+```
+
+### Q12: Create a vector with these values: 1071, 678, 1151, 879. Assign it to Q12.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q12 #
+
+### TYPE YOUR CODE BELOW ###
+Q12 <- c(1071, 678, 1151, 879)
+
+### VIEW OUTPUT ###
+Q12
+
+```
+
+### Q13: Create a vector with these names: tax collector, young man, physician, beloved. Assign it to Q13.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q13 #
+
+### TYPE YOUR CODE BELOW ###
+Q13 <- c('tax collector', 'young man', 'physician', 'beloved')
+
+
+### VIEW OUTPUT ###
+Q13
+
+```
+
+### Q14: Create a dataframe with Q10, Q11, Q12, and Q13. Assign it to Q14.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q14 #
+
+### TYPE YOUR CODE BELOW ###
+Q14 <- data.frame(Q10, Q11, Q12, Q13)
+
+### VIEW OUTPUT ###
+Q14
+
+```
+
+### Q15: Find the class of Q14. Assign it to Q15.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q15 #
+
+### TYPE YOUR CODE BELOW ###
+Q15 <- class(Q14)
+
+### VIEW OUTPUT ###
+Q15
+
+```
+
+Thanks to this [website](https://catholic-resources.org/Bible/NT-Statistics-Greek.htm) for some data.
+
+------------------------------------------------------------------------
+
+# Before submitting to Code Grade:
+
+-   Clear objects from your workspace. Click the broom in the Environment pane in the top right. This will erase any objects (like Q1, Q2) that you've stored.
+
+-   Rerun all your code. You can click the "Run" option in this pane in the top right, then select "Run all"). You should have all the objects stored again in the environment pane, and you should see no red error messages in the console below.
+
+------------------------------------------------------------------------
+
+This material is for enrolled students' academic use only and protected under U.S. Copyright Laws. This content must not be shared outside the confines of this course, in line with Eastern University's academic integrity policies. Unauthorized reproduction, distribution, or transmission of this material, including but not limited to posting on third-party platforms like GitHub, is strictly prohibited and may lead to disciplinary action. You may not alter or remove any copyright or other notice from copies of any content taken from BrightSpace or Eastern University’s website.
+© Copyright Notice 2024, Eastern University - All Rights Reserved
+

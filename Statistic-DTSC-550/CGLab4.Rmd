@@ -1,0 +1,375 @@
+---
+title: 'DTSC 550: Intro to Statistical Modeling'
+subtitle: 'CG Lab 4 Template'
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+---
+
+# Student Info
+
+*Name:* 
+
+*Term:*
+
+*Date:*
+
+------------------------------------------------------------------------
+
+# File Naming
+
+Name your file *`CGLab4`*. This file is a "notebook," which allows text and code mixed together. The file has the extension '.Rmd' stands for Rmarkdown.
+
+------------------------------------------------------------------------
+
+# Directions
+
+This file includes all the questions for this Code Grade (CG) Lab.
+
+**Important**: You *must* type your code in this template in order for Code Grade to give you feedback on your code.
+
+------------------------------------------------------------------------
+
+## Adding Code Blocks
+
+You do not need to insert any new code blocks. If choose to, you can do so by clicking the button above with a green C and a plus sign. (There are other ways to insert code blocks, too)
+
+------------------------------------------------------------------------
+
+## Adding Comments
+
+You can add comments *within* a code block by using one or more `#`.
+
+------------------------------------------------------------------------
+
+## Allowable Packages
+
+For CodeGrade purposes, you must comment out any package installation code prior to submitting your assignment (ie: #install.packages("package_name"))
+**Important**: Do not install any packages or use any libraries for this lab. Use only base R (built-in) functions.
+
+------------------------------------------------------------------------
+
+## Grading
+
+Your code will be graded automatically by Code Grade:
+
+-   It will test that there are no syntax errors in your code. If there are, you will need to correct these mistakes and re-submit your code.
+
+-   Next, it will check that your answers are consistent with what we're looking for.
+
+-   Lastly, it will check that you used the intended functions. This prevents hard-coded answers and ensures solutions are obtained strictly though your coding.
+
+------------------------------------------------------------------------
+
+## Cautions
+
+**Important**: Do not share or post your solutions to this lab anywhere online, as that would be considered plagiarism and carries academic consequences
+
+Do not "hard-code" any answers in this assignment. For example, suppose Question 0 asked to find the average of 10 and 20 and store it in Q0. You should have Q0 \<- mean(c(10, 20)) for your answer, not Q0 \<- 15. In other words, you should be using functions (like "mean") to find answers, rather than storing the values (15) themselves.
+
+The problem with hard-coding is that if the data changes, your answer will not change with it (and therefore it will be wrong). Using a function (like "mean"), on the other hand, will recalculate the mean regardless if the data changes. We want code that can handle to these types of changes If your code is found to have hard-coded answers, you may receive a 0% on the assignment.
+
+**Important**:
+
+Every coding language has its own style. Here are a few stylistic elements in R, but first an example of what to do and what not to do:
+
+Do this:
+```{r}
+Q1 <- head(data, 7)
+```
+
+Don't do this:
+```{r}
+Q1=head ( data,7 )
+```
+
+What are the differences? (There are a lot!)
+
+1. The assignment operator `<-` should be used, not `=`.
+
+2. Spaces should be used around the operator.
+
+3. A space should be used after a comma.
+
+4. Spaces should not be used after or before a `(` or `)`...or with an open or close bracket.
+
+5. We don't include a space after a function name.
+
+The **structure tests** on CodeGrade will look not only for hard coded answers, but also for for stylistic issues like the above.
+
+------------------------------------------------------------------------
+
+# Data File Description
+
+In this assignment, we will use a data set called *`APprediction`*. This is data collected from high school students taking an Advanced Placement (AP) Statistics class over several years.
+
+For more information on the meanings of column names, see the PDF on Brightspace called *"APprediction Data Dictionary"*. It is in the same folder that contains this template.
+
+This is the same file we used for *CG Lab 3* and it is stored in the folder there.
+
+------------------------------------------------------------------------
+
+# Steps to Load Data into R
+
+*Step 1* Download the *`APprediction.csv`* file from Brightspace. Note to Mac users: If Numbers opens the file, you may need to export it as a .csv, rather than a .numbers file.
+
+*Step 2* Place the CSV file in the same directory (or folder) as this Rmd file. It is vitally important that the csv file and your R file are in the same folder.
+
+*Step 3* In RStudio, read/upload the CSV file into R by doing one of the following:
+
+a)  Go to "Tools" at the top, then select "Global Options", then select "Browse" and find the folder where the CSV file is located. This step makes sure R will look into the correct folder for the CSV.
+
+b)  Or, you can set your working directory with *`setwd( <your directory> )`* First, you can get your working directory with *`getwd()`* to see where R is currently looking for the file. If you chose this approach, be sure to comment out (with \#) the setwd code; otherwise, CodeGrade will crash.
+
+    i)  On my MAC, for example, I would type *`setwd("/Users/home/Desktop")`* if the file is saved on my Desktop.
+
+    ii) On my PC, on the other hand I would type *`setwd("C:/Users/17605/Desktop")`*.
+
+c)  You can also use the Output pane in the bottom right of RStudio, and navigate to the location of the file under "Files".
+
+------------------------------------------------------------------------
+
+## Preliminaries
+
+```{r}
+### It's always a good idea when working in RStudio to start with a clean environment. 
+
+### Clear objects from the environment memory that may be leftover from previous versions of your code or other assignments by running the following line:
+rm(list = ls())
+
+### Load Libraries
+# There are no  libraries needed for this assignment! 
+# Use only base R functionality. 
+```
+
+```{r}
+### Run this code block after you have completed Step 3 above (uploading the APprediction.csv)
+
+# Read CSV
+apdata <- read.csv("APprediction.csv", stringsAsFactors = TRUE)
+
+
+# Ensure that ID variable is a factor, not a character
+apdata$ID <- as.factor(apdata$ID)
+```
+
+For information on the use of stringsAsFactors=TRUE above, see [here](https://stackoverflow.com/questions/5187745/imported-a-csv-dataset-to-r-but-the-values-becomes-factors)
+
+------------------------------------------------------------------------
+
+# Questions
+
+## Q1: Find the mean weighted GPA of the students. Assign it to Q1.
+
+Use a function; do not hard-code the answer.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q1 #
+
+### TYPE YOUR CODE BELOW ###
+Q1 <- mean(apdata$wGPA, na.rm = T)
+
+### VIEW OUTPUT ###
+Q1
+
+```
+
+------------------------------------------------------------------------
+
+## Q2: Find the median weighted GPA of the students. Assign it to Q2.
+
+Use a function; do not hard-code the answer.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q2 #
+
+### TYPE YOUR CODE BELOW ###
+Q2 <- median(apdata$wGPA, na.rm = T)
+
+### VIEW OUTPUT ###
+Q2
+ 
+```
+
+------------------------------------------------------------------------
+
+## Q3: Find the minimum weighted GPA of the students. Assign it to Q3.
+
+Use a function; do not hard-code the answer.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q3 #
+
+### TYPE YOUR CODE BELOW ###
+Q3 <- min(apdata$wGPA, na.rm = T)
+
+### VIEW OUTPUT ###
+Q3
+ 
+```
+
+------------------------------------------------------------------------
+
+## Q4: Find the maximum weighted GPA of the students. Assign it to Q4.
+
+Use a function; do not hard-code the answer.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q4 #
+
+### TYPE YOUR CODE BELOW ###
+Q4 <- max(apdata$wGPA, na.rm = T)
+
+### VIEW OUTPUT ###
+Q4
+  
+```
+
+------------------------------------------------------------------------
+
+## Q5: Find the range of the weighted GPA of the students. Assign it to Q5.
+
+Use base R functionality; do not hard-code the answer. Note! There is no single `range` function in base R. No packages are allowed here.
+
+Do not use any of your previous stored answers (like Q3) to help calculate this; CodeGrade is not set up to let you use previous answers to solve current questions.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q5 #
+
+### TYPE YOUR CODE BELOW ###
+Q5 <- max(apdata$wGPA, na.rm = T) - min(apdata$wGPA, na.rm = T)
+
+### VIEW OUTPUT ###
+Q5
+
+```
+
+------------------------------------------------------------------------
+
+## Q6: Find the variance of the weighted GPA of the students. Assign it to Q6.
+
+Use a function; do not hard-code the answer.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q6 #
+
+### TYPE YOUR CODE BELOW ###
+Q6 <- var(apdata$wGPA, na.rm = T)
+
+### VIEW OUTPUT ###
+Q6
+
+```
+
+------------------------------------------------------------------------
+
+## Q7: Find the standard deviation of the weighted GPA of the students. Assign it to Q7.
+
+Use a function; do not hard-code the answer.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q7 #
+
+### TYPE YOUR CODE BELOW ###
+Q7 <- sd(apdata$wGPA, na.rm = T)
+
+### VIEW OUTPUT ###
+Q7
+
+```
+
+------------------------------------------------------------------------
+
+## Q8: Store the summary of only the weighted GPA data and store it in Q8.
+
+Do *not* store the summary of *all* variables, just the weighted GPA variable.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q8 #
+
+### TYPE YOUR CODE BELOW ###
+Q8 <- summary(apdata$wGPA)
+
+### VIEW OUTPUT ###
+Q8
+
+```
+
+------------------------------------------------------------------------
+
+## Q9: Store the weighted GPA of the student whose data is stored in the 200th row of the data set in Q9.
+
+Use indexing. Do not hard-code the answer.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q9 #
+
+### TYPE YOUR CODE BELOW ###
+Q9 <- apdata$wGPA[200]
+
+### VIEW OUTPUT ###
+Q9
+
+```
+
+------------------------------------------------------------------------
+
+## Q10: Convert the weighted GPA for the student in the 200th row into a z-score (standardized score). Assign it to Q10.
+
+When calculating this z-score, do *not* use the vectors above which contain the statistics needed to calculate a z-score. CodeGrade is not set to allow you to use your previous answers when answering Q10.
+
+Do not hard-code the answer. Use only base R functionality (i.e., no special packages).
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q10 #
+
+### TYPE YOUR CODE BELOW ###
+Q10 <- (apdata$wGPA[200] -mean(apdata$wGPA,na.rm=T))/sd(apdata$wGPA,na.rm=T)
+### VIEW OUTPUT ###
+Q10
+
+```
+
+------------------------------------------------------------------------
+
+## Q11: Find the 25th, 50th, and 75th percentiles (a.k.a. quartiles) of the weighted GPAs in this data set. Assign them to Q11.
+
+For assistance, see [here](https://www.geeksforgeeks.org/how-to-calculate-quartiles-in-r/) or the R documentation.
+
+Do not hard-code the answer.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q11 #
+
+### TYPE YOUR CODE BELOW ###
+
+Q11 <- quantile((apdata$wGPA), probs = c(0.25,0.5,0.75), na.rm = TRUE)
+
+### VIEW OUTPUT ###
+Q11
+
+```
+
+------------------------------------------------------------------------
+
+# Before submitting to Code Grade:
+
+1)  Clear objects from your workspace. Click the broom in the Environment pane in the top right. This will erase any objects (like Q1, Q2) that you've stored.
+
+2)  Rerun all your code. You can click the "Run" option in this pane in the top right, then select "Run all"). You should have all the objects stored again in the environment pane, and you should see no red error messages in the console below.
+
+------------------------------------------------------------------------
+This material is for enrolled students' academic use only and protected under U.S. Copyright Laws. This content must not be shared outside the confines of this course, in line with Eastern University's academic integrity policies. Unauthorized reproduction, distribution, or transmission of this material, including but not limited to posting on third-party platforms like GitHub, is strictly prohibited and may lead to disciplinary action. You may not alter or remove any copyright or other notice from copies of any content taken from BrightSpace or Eastern University’s website.
+© Copyright Notice 2024, Eastern University - All Rights Reserved
+

@@ -1,0 +1,395 @@
+---
+title: 'DTSC 550: Intro to Statistical Modeling'
+subtitle: 'CG Lab 3 Template'
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+  markdown: 
+---
+
+# Student Info
+
+*Name:*
+
+*Term:*
+
+*Date:*
+
+------------------------------------------------------------------------
+
+# File Naming
+
+Name your file *`CGLab3`*. This file is a "notebook," which allows text and code mixed together. The file has the extension '.Rmd' stands for Rmarkdown.
+
+------------------------------------------------------------------------
+
+# Directions
+
+This file includes all the questions for this Code Grade (CG) Lab.
+
+**Important**: You *must* type your code in this template in order for Code Grade to give you feedback on your code.
+
+------------------------------------------------------------------------
+
+## Adding Code Blocks
+
+You do not need to insert any new code blocks. If choose to, you can do so by clicking the button above with a green C and a plus sign. (There are other ways to insert code blocks, too)
+
+------------------------------------------------------------------------
+
+## Adding Comments
+
+You can add comments *within* a code block by using one or more `#`.
+
+------------------------------------------------------------------------
+
+## Allowable Packages
+
+For CodeGrade purposes, you must comment out any package installation code prior to submitting your assignment (ie: #install.packages("package_name")) **Important**: Do not install any packages or use any libraries for this lab. Use only base R (built-in) functions.
+
+------------------------------------------------------------------------
+
+## Grading
+
+Your code will be graded automatically by Code Grade:
+
+-   It will test that there are no syntax errors in your code. If there are, you will need to correct these mistakes and re-submit your code.
+
+-   Next, it will check that your answers are consistent with what we're looking for.
+
+-   Lastly, it will check that you used the intended functions. This prevents hard-coded answers and ensures solutions are obtained strictly though your coding.
+
+------------------------------------------------------------------------
+
+## Cautions
+
+**Important**: Do not share or post your solutions to this lab anywhere online, as that would be considered plagiarism and carries academic consequences
+
+Do not "hard-code" any answers in this assignment. For example, suppose Question 0 asked to find the average of 10 and 20 and store it in Q0. You should have Q0 \<- mean(c(10, 20)) for your answer, not Q0 \<- 15. In other words, you should be using functions (like "mean") to find answers, rather than storing the values (15) themselves.
+
+The problem with hard-coding is that if the data changes, your answer will not change with it (and therefore it will be wrong). Using a function (like "mean"), on the other hand, will recalculate the mean regardless if the data changes. We want code that can handle to these types of changes If your code is found to have hard-coded answers, you may receive a 0% on the assignment.
+
+**Important**:
+
+Every coding language has its own style. Here are a few stylistic elements in R, but first an example of what to do and what not to do:
+
+Do this:
+
+```{r}
+Q1 <- head(data, 7)
+```
+
+Don't do this:
+
+```{r}
+Q1=head ( data,7 )
+```
+
+What are the differences? (There are a lot!)
+
+1.  The assignment operator `<-` should be used, not `=`.
+
+2.  Spaces should be used around the operator.
+
+3.  A space should be used after a comma.
+
+4.  Spaces should not be used after or before a `(` or `)`...or with an open or close bracket.
+
+5.  We don't include a space after a function name.
+
+The **structure tests** on CodeGrade will look not only for hard coded answers, but also for other stylistic issues like the above.
+
+------------------------------------------------------------------------
+
+# Data File Description
+
+In this assignment, we will use a data set called *`APprediction`*. This is data collected from high school students taking an Advanced Placement (AP) Statistics class over several years.
+
+For more information on the meanings of column names, see the PDF on Brightspace called *"APprediction Data Dictionary"*. It is in the same folder that contains this template.
+
+------------------------------------------------------------------------
+
+# Steps to Load Data into R
+
+*Step 1* Download the *`APprediction.csv`* file from Brightspace. Note to Mac users: If Numbers opens the file, you may need to export it as a .csv, rather than a .numbers file.
+
+*Step 2* Place the CSV file in the same directory (or folder) as this Rmd file. It is vitally important that the csv file and your R file are in the same folder.
+
+*Step 3* In RStudio, read/upload the CSV file into R by doing one of the following:
+
+a)  Go to "Tools" at the top, then select "Global Options", then select "Browse" and find the folder where the CSV file is located. This step makes sure R will look into the correct folder for the CSV.
+
+b)  Or, you can set your working directory with *`setwd( <your directory> )`* First, you can get your working directory with *`getwd()`* to see where R is currently looking for the file. If you chose this approach, be sure to comment out (with \#) the setwd code; otherwise, CodeGrade will crash.
+
+    i)  On my MAC, for example, I would type *`setwd("/Users/home/Desktop")`* if the file is saved on my Desktop.
+
+    ii) On my PC, on the other hand I would type *`setwd("C:/Users/17605/Desktop")`*.
+
+c)  You can also use the Output pane in the bottom right of RStudio, and navigate to the location of the file under "Files".
+
+------------------------------------------------------------------------
+
+## Preliminaries
+
+```{r}
+### It's always a good idea when working in RStudio to start with a clean environment. 
+
+### Clear objects from the environment memory that may be leftover from previous versions of your code or other assignments by running the following line:
+rm(list = ls())
+
+### Load Libraries
+# There are no  libraries needed for this assignment! 
+# Use only base R functionality. 
+```
+
+```{r}
+### Run this code block after you have completed Step 3 above (uploading the APprediction.csv)
+
+# Read CSV
+apdata <- read.csv("APprediction.csv", stringsAsFactors = TRUE)
+
+# Ensure that ID variable is a factor, not a character
+apdata$ID <- as.factor(apdata$ID)
+```
+
+For information on the use of stringsAsFactors=TRUE above, see [here](https://stackoverflow.com/questions/5187745/imported-a-csv-dataset-to-r-but-the-values-becomes-factors)
+
+------------------------------------------------------------------------
+
+# Questions
+
+## Q1: Take a sneak peek at the first 5 rows of the data set. Assign these rows to Q1. Notice there are numerous NAs; data was not collected for some of the columns so it is "not available" (NA).
+
+Use a function, rather than indexing.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q1 #
+
+### TYPE YOUR CODE BELOW ###
+Q1 <- head(apdata, 5)
+
+### VIEW OUTPUT ###
+Q1
+  
+```
+
+------------------------------------------------------------------------
+
+## Q2: Take a sneak peek at the last 5 rows of the data set. Assign these rows to Q2.
+
+Use a function, rather than indexing.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q2 #
+
+### TYPE YOUR CODE BELOW ###
+Q2 <- tail(apdata, 5)
+
+### VIEW OUTPUT ###
+Q2 
+  
+```
+
+------------------------------------------------------------------------
+
+## Q3: Which set of rows---the first five or the last five---has fewer NAs? Store either "first five" or "last five" in a variable called Q3.
+
+This may be of interest to a data scientist, if there appears to be a pattern of NAs in the data.
+
+Hard-coding (just typing) the answer is intended and acceptable here.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q3 #
+
+### TYPE YOUR CODE BELOW ###
+Q3 <- "last five"
+
+### VIEW OUTPUT ###
+Q3
+  
+```
+
+------------------------------------------------------------------------
+
+## Q4: Find the structure of the data set and assign it to Q4. For CodeGrade to work, use ls.str() instead of str(), since you cannot store the structure (str) as an object for efficiency reasons.
+
+For more information on str(), see [here](https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/str)
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q4 #
+
+### TYPE YOUR CODE BELOW ###
+Q4 <- ls.str(apdata)
+
+### VIEW OUTPUT ###
+Q4
+  
+```
+
+------------------------------------------------------------------------
+
+## Q5: Find the dimensions of the data set and assign it to Q5.
+
+Do not hard-code the answer! Use a function.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q5 #
+
+### TYPE YOUR CODE BELOW ###
+Q5 <- dim(apdata)
+
+### VIEW OUTPUT ###
+Q5 
+
+```
+
+------------------------------------------------------------------------
+
+## Q6: Find the names of the columns and assign them to Q6.
+
+Do not hard-code the names! Use a function.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q6 #
+
+### TYPE YOUR CODE BELOW ###
+Q6 <- names(apdata)
+
+### VIEW OUTPUT ###
+Q6
+
+```
+
+------------------------------------------------------------------------
+
+## Q7: Find the summary of the data set and assign it to Q7.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q7 #
+
+### TYPE YOUR CODE BELOW ###
+Q7 <- summary(apdata)
+
+### VIEW OUTPUT ###
+Q7 
+
+```
+
+------------------------------------------------------------------------
+
+## Q8: For the first eight columns, reading from left to right, identify each variable as either nominal, ordinal, interval, or ratio data. Create a vector named Q8 with your answers.
+
+Type the entire, uncapitalized word. You will have a vector of length 8.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q8 #
+
+### TYPE YOUR CODE BELOW ###
+Q8 <- c("interval","ordinal","nominal","ordinal","nominal","nominal","ratio","ratio")
+
+### VIEW OUTPUT ###
+Q8
+
+```
+
+------------------------------------------------------------------------
+
+## Q9: Find the unique values of the town variable. Wrap your code in as.factor(), then assign these values to Q9.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q9 #
+Q9 <- as.factor(unique(apdata$Town))
+### TYPE YOUR CODE BELOW ###
+
+
+### VIEW OUTPUT ###
+Q9
+
+```
+
+------------------------------------------------------------------------
+
+## Q10 Find the proportion of students who live in each town. Store the table of proportions in Q10. Round the proportions to three decimal places. See here for assistance.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q10 #
+
+### TYPE YOUR CODE BELOW ###
+Q10 <- round(proportions(table(apdata$Town)),3)
+
+### VIEW OUTPUT ###
+Q10 
+
+```
+
+------------------------------------------------------------------------
+
+## Q11: Summarize the PrevMath variable in a table. Store the table in Q11.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q11 #
+
+### TYPE YOUR CODE BELOW ###
+Q11 <- table(apdata$PrevMath)
+
+### VIEW OUTPUT ###
+Q11 
+
+```
+
+------------------------------------------------------------------------
+
+## Q12: Find the proportion of students who had the various previous math courses. Store the table of proportions in Q12. Round the proportions to three decimal places.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q12 #
+
+### TYPE YOUR CODE BELOW ###
+Q12 <- round(proportions(table(apdata$PrevMath)),3)
+
+### VIEW OUTPUT ###
+Q12
+
+```
+
+------------------------------------------------------------------------
+
+## Q13: Find the name of the first continuous (not discrete) variable and assign the name to Q13.
+
+Use indexing to access the name, rather than just typing (hard-coding) it.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q13 #
+
+### TYPE YOUR CODE BELOW ###
+Q13 <- names(apdata[7])
+
+### VIEW OUTPUT ###
+Q13 
+
+```
+
+------------------------------------------------------------------------
+
+# Before submitting to Code Grade:
+
+1)  Clear objects from your workspace. Click the broom in the Environment pane in the top right. This will erase any objects (like Q1, Q2) that you've stored.
+
+2)  Rerun all your code. You can click the "Run" option in this pane in the top right, then select "Run all"). You should have all the objects stored again in the environment pane, and you should see no red error messages in the console below.
+
+------------------------------------------------------------------------
+
+This material is for enrolled students' academic use only and protected under U.S. Copyright Laws. This content must not be shared outside the confines of this course, in line with Eastern University's academic integrity policies. Unauthorized reproduction, distribution, or transmission of this material, including but not limited to posting on third-party platforms like GitHub, is strictly prohibited and may lead to disciplinary action. You may not alter or remove any copyright or other notice from copies of any content taken from BrightSpace or Eastern University's website. © Copyright Notice 2024, Eastern University - All Rights Reserved

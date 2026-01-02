@@ -1,0 +1,251 @@
+---
+title: 'DTSC 550: Intro to Statistical Modeling'
+subtitle: 'CG Lab 1 Template'
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+---
+
+# Student Info
+
+*Name:*
+
+*Term:*
+
+*Date:*
+
+------------------------------------------------------------------------
+
+# File Naming
+
+Name your file *`CGLab1`*. This file is a "notebook," which allows text and code mixed together. The file has the extension '.Rmd' stands for Rmarkdown.
+
+------------------------------------------------------------------------
+
+# Directions
+
+This file includes all the questions for this Code Grade (CG) Lab.
+
+**Important**: You *must* type your code in this template in order for Code Grade to give you feedback on your code.
+
+------------------------------------------------------------------------
+
+## Adding Code Blocks
+
+You do not need to insert any new code blocks. If choose to, you can do so by clicking the button above with a green C and a plus sign. (There are other ways to insert code blocks, too)
+
+------------------------------------------------------------------------
+
+## Adding Comments
+
+You can add comments *within* a code block by using one or more `#`.
+
+------------------------------------------------------------------------
+
+## Allowable Packages
+
+For CodeGrade purposes, you must comment out any package installation code prior to submitting your assignment (ie: #install.packages("package_name"))
+**Important**: Do not install any packages or use any libraries for this lab. Use only base R (built-in) functions.
+
+------------------------------------------------------------------------
+
+## Grading
+
+Your code will be graded automatically by Code Grade:
+
+-   It will test that there are no syntax errors in your code. If there are, you will need to correct these mistakes and re-submit your code.
+
+-   Next, it will check that your answers are consistent with what we're looking for.
+
+-   Lastly, it will check that you used the intended functions. This prevents hard-coded answers and ensures solutions are obtained strictly though your coding.
+
+------------------------------------------------------------------------
+
+## Cautions
+
+**Important**: Do not share or post your solutions to this lab anywhere online, as that would be considered plagiarism and carries academic consequences
+
+Do not “hard-code” any answers in this assignment. For example, suppose Question 0 asked to find the average of 10 and 20 and store it in Q0. You should have Q0 \<- mean(c(10, 20)) for your answer, not Q0 \<- 15. In other words, you should be using functions (like “mean”) to find answers, rather than storing the values (15) themselves.
+
+The problem with hard-coding is that if the data changes, your answer will not change with it (and therefore it will be wrong). Using a function (like “mean”), on the other hand, will recalculate the mean regardless if the data changes. We want code that can handle to these types of changes If your code is found to have hard-coded answers, you may receive a 0% on the assignment.
+
+**Important**:
+
+Every coding language has its own style. Here are a few stylistic elements in R, but first an example of what to do and what not to do:
+
+Do this:
+
+```{r}
+Q1 <- head(data, 7)
+```
+
+Don't do this:
+
+```{r}
+Q1=head ( data,7 )
+```
+
+What are the differences? (There are a lot!)
+
+1.  The assignment operator `<-` should be used, not `=`.
+
+2.  Spaces should be used around the operator.
+
+3.  A space should be used after a comma.
+
+4.  Spaces should not be used after or before a `(` or `)`...or with an open or close bracket.
+
+5.  We don't include a space after a function name.
+
+The **structure tests** on CodeGrade will look not only for hard coded answers, but also for for stylistic issues like the above.
+
+------------------------------------------------------------------------
+
+# Preliminaries
+
+```{r}
+### It's always a good idea when working in RStudio to start with a clean environment. 
+
+### Clear objects from the environment memory that may be leftover from previous versions of your code or other assignments by running the following line:
+rm(list = ls())
+
+### Load Libraries
+# There are no  libraries needed for this assignment! 
+# Use only base R functionality. 
+```
+
+------------------------------------------------------------------------
+
+# Questions
+
+## Question 1 (aka, Q1): Create a variable called Q1 containing the names of my family: "Jeff", "Emily", and "Isabella".
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q1 #
+
+### TYPE YOUR CODE BELOW ###
+Q1 <- c("Jeff","Emily","Isabella")
+
+### Viewing your variable is an important habit to get into. This helps you ensure your output is as expected. 
+Q1
+
+```
+
+## Q2: Create a variable called `eicher_height` containing the value of 5.833. Convert `eicher_height` from feet to centimeters and assign the result to Q2. Do not round.
+
+*Note: If you don't know how to convert feet to centimeters, find the conversion factor on Google. Do not install a package or use a special function; CodeGrade is not set up to accept that approach.*
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q2 #
+
+### TYPE YOUR CODE BELOW ###
+eicher_height <- 5.833
+Q2 <- eicher_height * 30.48
+
+### VIEW OUTPUT ###
+Q2
+
+```
+
+## Q3: Create a variable called `my_fam_heights` with a vector containing the values 5.833, 5.6, and 2.1. Get the 2nd element by indexing the `my_fam_heights` variable. Assign it to Q3.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q3 #
+
+###TYPE YOUR CODE BELOW###
+my_fam_heights <- c(5.833,5.6,2.1)
+Q3 <- my_fam_heights[2]
+
+#### VIEW OUTPUT ###
+Q3
+
+```
+
+## Q4: Create a copy of my_fam_heights, called `new_fam_heights`. Change the 3rd value to 2.2 and store new_fam_heights as Q4.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q4 #
+
+### TYPE YOUR CODE BELOW ###
+new_fam_heights <- my_fam_heights
+new_fam_heights[3] <- 2.2
+Q4 <- new_fam_heights
+
+### VIEW OUTPUT ###
+Q4
+
+```
+
+## Q5: Create Q5 with the mean (i.e. average) of Q4.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q5 #
+
+### TYPE YOUR CODE BELOW ###
+
+Q5 <- mean(Q4)
+### VIEW OUTPUT ###
+Q5
+
+```
+
+## Q6: Round Q5 to one decimal place and assign the result to Q6.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q6 #
+
+### TYPE YOUR CODE BELOW ###
+Q6 <- round(Q5, 1)
+
+### VIEW OUTPUT ###
+Q6
+
+```
+
+## Q7: Find the median of Q4 and assign the result to Q7.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q7 #
+
+### TYPE YOUR CODE BELOW ###
+Q7 <- median(Q4)
+
+### VIEW OUTPUT ###
+Q7
+
+```
+
+## Q8: Convert all the heights stored in Q4 (as feet) to centimeters and assign the result to Q8.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q8 #
+
+### TYPE YOUR CODE BELOW ###
+Q8 <- Q4 * 30.48
+
+### VIEW OUTPUT ###
+Q8
+
+```
+
+------------------------------------------------------------------------
+
+# Before submitting to Code Grade:
+
+-   Clear objects from your workspace. Click the broom in the Environment pane in the top right. This will erase any objects (like Q1, Q2) that you've stored.
+
+-   Rerun all your code. You can click the "Run" option in this pane in the top right, then select "Run all"). You should have all the objects stored again in the environment pane, and you should see no red error messages in the console below.
+
+------------------------------------------------------------------------
+
+This material is for enrolled students' academic use only and protected under U.S. Copyright Laws. This content must not be shared outside the confines of this course, in line with Eastern University's academic integrity policies. Unauthorized reproduction, distribution, or transmission of this material, including but not limited to posting on third-party platforms like GitHub, is strictly prohibited and may lead to disciplinary action. You may not alter or remove any copyright or other notice from copies of any content taken from BrightSpace or Eastern University’s website.
+
+© Copyright Notice 2024, Eastern University - All Rights Reserved

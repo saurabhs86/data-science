@@ -1,0 +1,563 @@
+---
+title: 'DTSC 550: Intro to Statistical Modeling'
+subtitle: 'CG Lab 5 Template'
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+---
+
+# Student Info
+
+*Name:*
+
+*Term:*
+
+*Date:*
+
+------------------------------------------------------------------------
+
+# File Naming
+
+Name your file *`CGLab5`*. This file is a "notebook," which allows text and code mixed together. The file has the extension '.Rmd' stands for Rmarkdown.
+
+------------------------------------------------------------------------
+
+# Directions
+
+This file includes all the questions for this Code Grade (CG) Lab.
+
+**Important**: You *must* type your code in this template in order for Code Grade to give you feedback on your code.
+
+------------------------------------------------------------------------
+
+## Adding Code Blocks
+
+You do not need to insert any new code blocks. If choose to, you can do so by clicking the button above with a green C and a plus sign. (There are other ways to insert code blocks, too)
+
+------------------------------------------------------------------------
+
+## Adding Comments
+
+You can add comments *within* a code block by using one or more `#`.
+
+------------------------------------------------------------------------
+
+## Allowable Packages
+
+For CodeGrade purposes, you must comment out any package installation code prior to submitting your assignment (ie: #install.packages("package_name")) **Important**: Do not install any packages or use any libraries for this lab. Use only base R (built-in) functions.
+
+------------------------------------------------------------------------
+
+## Grading
+
+Your code will be graded automatically by Code Grade:
+
+-   It will test that there are no syntax errors in your code. If there are, you will need to correct these mistakes and re-submit your code.
+
+-   Next, it will check that your answers are consistent with what we're looking for.
+
+-   Lastly, it will check that you used the intended functions. This prevents hard-coded answers and ensures solutions are obtained strictly though your coding.
+
+------------------------------------------------------------------------
+
+## Cautions
+
+**Important**: Do not share or post your solutions to this lab anywhere online, as that would be considered plagiarism and carries academic consequences
+
+Do not "hard-code" any answers in this assignment. For example, suppose Question 0 asked to find the average of 10 and 20 and store it in Q0. You should have Q0 \<- mean(c(10, 20)) for your answer, not Q0 \<- 15. In other words, you should be using functions (like "mean") to find answers, rather than storing the values (15) themselves.
+
+The problem with hard-coding is that if the data changes, your answer will not change with it (and therefore it will be wrong). Using a function (like "mean"), on the other hand, will recalculate the mean regardless if the data changes. We want code that can handle to these types of changes If your code is found to have hard-coded answers, you may receive a 0% on the assignment.
+
+**Important**:
+
+Every coding language has its own style. Here are a few stylistic elements in R, but first an example of what to do and what not to do:
+
+Do this:
+
+```{r}
+Q1 <- head(data, 7)
+```
+
+Don't do this:
+
+```{r}
+Q1=head ( data,7 )
+```
+
+What are the differences? (There are a lot!)
+
+1.  The assignment operator `<-` should be used, not `=`.
+
+2.  Spaces should be used around the operator.
+
+3.  A space should be used after a comma.
+
+4.  Spaces should not be used after or before a `(` or `)`...or with an open or close bracket.
+
+5.  We don't include a space after a function name.
+
+The **structure tests** on CodeGrade will look not only for hard coded answers, but also for for stylistic issues like the above.
+
+------------------------------------------------------------------------
+
+# Data File Description
+
+In this assignment, we will use a data set called *`APprediction`*. This is data collected from high school students taking an Advanced Placement (AP) Statistics class over several years.
+
+For more information on the meanings of column names, see the PDF on Brightspace called *"APprediction Data Dictionary"*. It is in the same folder that contains this template.
+
+This is the same file we used for *CG Lab 3* and it is stored in the folder there.
+
+------------------------------------------------------------------------
+
+# Steps to Load Data into R
+
+*Step 1* Download the *`APprediction.csv`* file from Brightspace. Note to Mac users: If Numbers opens the file, you may need to export it as a .csv, rather than a .numbers file.
+
+*Step 2* Place the CSV file in the same directory (or folder) as this Rmd file. It is vitally important that the csv file and your R file are in the same folder.
+
+*Step 3* In RStudio, read/upload the CSV file into R by doing one of the following:
+
+a)  Go to "Tools" at the top, then select "Global Options", then select "Browse" and find the folder where the CSV file is located. This step makes sure R will look into the correct folder for the CSV.
+
+b)  Or, you can set your working directory with *`setwd( <your directory> )`* First, you can get your working directory with *`getwd()`* to see where R is currently looking for the file. If you chose this approach, be sure to comment out (with \#) the setwd code; otherwise, CodeGrade will crash.
+
+    i)  On my MAC, for example, I would type *`setwd("/Users/home/Desktop")`* if the file is saved on my Desktop.
+
+    ii) On my PC, on the other hand I would type *`setwd("C:/Users/17605/Desktop")`*.
+
+c)  You can also use the Output pane in the bottom right of RStudio, and navigate to the location of the file under "Files".
+
+------------------------------------------------------------------------
+
+## Preliminaries
+
+```{r}
+### It's always a good idea when working in RStudio to start with a clean environment. 
+
+### Clear objects from the environment memory that may be leftover from previous versions of your code or other assignments by running the following line:
+rm(list = ls())
+
+### Load Libraries
+# There are no  libraries needed for this assignment! 
+# Use only base R functionality. 
+```
+
+```{r}
+### Run this code block after you have completed Step 3 above (uploading the APprediction.csv)
+
+# Read CSV
+apdata <- read.csv("APprediction.csv", stringsAsFactors = TRUE)
+
+# Ensure that ID variable is a factor, not a character
+apdata$ID <- as.factor(apdata$ID)
+head(apdata)
+```
+
+For information on the use of stringsAsFactors=TRUE above, see [here](https://stackoverflow.com/questions/5187745/imported-a-csv-dataset-to-r-but-the-values-becomes-factors)
+
+------------------------------------------------------------------------
+
+# Questions
+
+# Part 1: Explore the Dataset
+
+## Q1: Investigate the data set by considering its structure, column names and dimensions. Store the dimensions in Q1.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q1 #
+
+### TYPE YOUR CODE BELOW ###
+Q1 <- dim(apdata)
+
+### VIEW OUTPUT ###
+Q1
+
+```
+
+## Q2: Provide a summary of the students' actual AP exam score and store it in Q2.
+
+The variable `ACTUAL` shows the actual Advanced Placement (AP) Statistics exam score of the student. This end-of-course exam tests students on a variety of statistical content, and if a student can earn a score of 3, 4, or 5, they "pass" the exam and may be eligible for college credit (scores of 1 and 2 are not passing).
+
+We would like to predict a student's score on this exam based on information we have on them. Let's first analyze the ACTUAL column, which will be our dependent variable (i.e., response variable).
+
+```{r}
+### Do not change and do not delete the comment below. It is required for CodeGrade to run properly.
+# CG Q2 #
+
+### TYPE YOUR CODE BELOW ###
+Q2 <- summary(apdata$ACTUAL)
+
+### VIEW OUTPUT ###
+Q2
+
+```
+
+## Q3: Make a table of the students' actual AP exam scores and store it in Q3.
+
+If a student did not take the exam, their score was entered as a zero (0). We will drop these students from our analysis later in this assignment.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q3 #
+
+###TYPE YOUR CODE BELOW###
+Q3 <- table(apdata$ACTUAL)
+
+#### VIEW OUTPUT ###
+Q3
+
+```
+
+## Q4: Provide a summary of the students' PSAT scores and store it in Q4.
+
+We will use a student's PSAT score to predict their actual AP exam score. The PSAT is a standardized test covering math, reading, and writing, given to high school juniors.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q4 #
+
+### TYPE YOUR CODE BELOW ###
+Q4 <- summary(apdata$PSAT)
+
+### VIEW OUTPUT ###
+Q4
+
+```
+
+## Q5: How many students have missing PSAT scores? Store the answer in Q5.
+
+You can hard-code this answer.
+
+We will fix these missing values later in this assignment.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q5 #
+
+### TYPE YOUR CODE BELOW ###
+Q5 <- sum(is.na(apdata$PSAT))
+
+### VIEW OUTPUT ###
+Q5
+
+```
+
+------------------------------------------------------------------------
+
+# Part 2: Visualize Variables of Interest
+
+## Q6A: Create a horizontal boxplot of the PSAT scores and be sure to label the x-axis with the name of the variable of interst. Store the object in Q6A.
+
+See here for the [boxplot documentation](https://www.rdocumentation.org/packages/graphics/versions/3.6.2/topics/boxplot)
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q6A #
+
+### TYPE YOUR CODE BELOW ###
+Q6A <- boxplot(apdata$PSAT, horizontal = TRUE, xlab="PSAT" ,main="Variablity for PSAT score")
+
+### VIEW OUTPUT ###
+Q6A
+
+```
+
+## Q6B: Does the boxplot you created in Q6A show any outliers? Store your answer as either "yes, high outliers", "yes, low outliers", "yes, both high and low outliers" or "no outliers" in Q6B.
+
+Hard-coding is intended here.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q6B #
+
+### TYPE YOUR CODE BELOW ###
+Q6B <- "yes, low outliers"
+
+### VIEW OUTPUT ###
+Q6B
+
+```
+
+## Q7A: Create a histogram of the actual AP scores. Be sure to label the x-axis with the name of the variable of interest.
+
+See here for the [histogram documentation](https://www.rdocumentation.org/packages/graphics/versions/3.6.2/topics/hist)
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q7A #
+
+### TYPE YOUR CODE BELOW ###
+Q7A <- hist(apdata$ACTUAL, breaks = "Sturges",
+     include.lowest = TRUE, right = TRUE,
+     density = NULL, angle = 45, col = NULL, border = NULL,
+     main = paste("Histogram of Actual Score" ),
+     xlab = "ACTUAL AP Score", 
+     axes = TRUE, plot = TRUE, labels = FALSE)
+### VIEW OUTPUT ###
+Q7A
+
+```
+
+## Q7B: Is the shape of the histogram you created in Q7A left-skewed, right-skewed, or roughly symmetric? Store your answer in Q7B as either "left-skewed", "right-skewed", or "roughly symmetric".
+
+Hard-coding is intended here.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q7B #
+
+### TYPE YOUR CODE BELOW ###
+Q7B <- "left-skewed"
+
+### VIEW OUTPUT ###
+Q7B
+
+```
+
+## Q8A: Create a histogram of the PSAT scores and be sure to label the x-axis with the name of the variable of interest. Store the object in Q8A.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q8A #
+
+### TYPE YOUR CODE BELOW ###
+
+Q8A <- hist(apdata$PSAT, breaks = "Sturges",
+     include.lowest = TRUE, right = TRUE,
+     density = NULL, angle = 45, col = NULL, border = NULL,
+     main = paste("Histogram of PSAT Score" ),
+     xlab = "PSAT Score", 
+     axes = TRUE, plot = TRUE, labels = FALSE)
+
+### VIEW OUTPUT ###
+Q8A
+
+```
+
+## Q8B: Look at the histogram you made in Q8A. If you ignore the PSAT scores less than 500, is the shape left-skewed, right-skewed, or roughly symmetric? Store your answer in Q8B as either "left-skewed", "right-skewed", or "roughly symmetric".
+
+Hard-coding is intended here.
+
+You do not need to actually remove PSAT scores less than 500; just do a visual inspection of the histogram.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q8B #
+
+### TYPE YOUR CODE BELOW ###
+
+Q8B <- "roughly symmetric"
+### VIEW OUTPUT ###
+Q8B
+
+```
+
+------------------------------------------------------------------------
+
+# Part 3A: Cleaning: Identifying and Removing NAs from the PSAT variable
+
+## Q9: Identify the indices of the students who do not have a PSAT score recorded (they are NAs). Store this set of indices as a vector called `NA_PSAT_index`.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q9 #
+
+### TYPE YOUR CODE BELOW ###
+NA_PSAT_index <- which(is.na(apdata$PSAT))
+
+### VIEW OUTPUT ###
+NA_PSAT_index
+
+```
+
+## Q10: Store the data frame of all the students who do not have a PSAT score recorded. Use the `NA_PSAT_index` vector. View only the PSAT and ACTUAL columns and store the edited data frame in Q10.
+
+The dataframe should have dimensions 65 x 2.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q10 #
+
+### TYPE YOUR CODE BELOW ###
+Q10 <-  apdata[NA_PSAT_index,c('PSAT','ACTUAL')]
+
+### VIEW OUTPUT ###
+Q10
+
+```
+
+## Q11: Store the data frame of all the students who do have a PSAT score recorded. Use the `NA_PSAT_index` vector. View only the PSAT and ACTUAL columns and store the edited data frame as `apdata_PSATnoNA.`
+
+The resulting dataframe should have dimensions 155 x 2.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG apdata_PSATnoNA #
+
+### TYPE YOUR CODE BELOW ###
+apdata_PSATnoNA <-  apdata[-NA_PSAT_index,c('PSAT','ACTUAL')]
+
+### VIEW OUTPUT ###
+apdata_PSATnoNA
+
+```
+
+------------------------------------------------------------------------
+
+# Part 3B: Cleaning: Removing the AP exam scores of Zero
+
+## Q12: In the `apdata_PSATnoNA` dataframe, how many rows have zeros for the actual AP exam score? Store the result in Q12.
+
+As mentioned earlier, these are students who did not take the AP exam, so a "zero" is basically an NA in this context.
+
+Do not hard-code the answer! In other words, do not simply have `Q12 <- {the number}`
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q12 #
+
+### TYPE YOUR CODE BELOW ###
+ACTUAL_NA_index <- which(apdata_PSATnoNA$ACTUAL == 0)
+Q12 <- length(ACTUAL_NA_index)
+### VIEW OUTPUT ###
+Q12
+
+```
+
+## Q13: Use the Boolean operator `>=` to determine if an actual AP exam score is greater than or equal to 1 (hence, avoiding all the zeros). Create a data frame with two columns (PSAT and ACTUAL) but only rows that have an ACTUAL score greater than or equal to 1. Name it `apdata_valid_apscores`.
+
+The resulting dataframe has dimensions 149 x 2.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG apdata_valid_apscores #
+
+### TYPE YOUR CODE BELOW ###
+ACTUAL_NA_index2 <- which(apdata_PSATnoNA$ACTUAL >= 1 )
+apdata_valid_apscores <- apdata_PSATnoNA[ACTUAL_NA_index2,c('PSAT','ACTUAL')]
+
+### VIEW OUTPUT ###
+apdata_valid_apscores
+
+```
+
+## Q14: Lastly, let's finish cleaning this dataframe. With the `apdata_valid_apscores` data frame you just created, use a Boolean operator to keep only rows with a PSAT score greater than 300. Any student with a PSAT score 300 or less was found to be a data entry error. (It happens!) Store this final data frame as `apdata_clean`. This data frame should have only the values 1 through 5 for the ACTUAL variable and values greater than 300 with no NAs in the PSAT scores variable.
+
+The resulting dataframe should have dimensions 119 x 2.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG apdata_clean #
+
+### TYPE YOUR CODE BELOW ###
+NA_ACTUAL_index <- which(apdata_valid_apscores$PSAT > 300)
+
+apdata_clean <- apdata_valid_apscores[NA_ACTUAL_index,c('PSAT','ACTUAL')]
+
+
+### VIEW OUTPUT ###
+apdata_clean
+
+```
+
+------------------------------------------------------------------------
+
+# Part 4: Modeling
+
+## Q15: Create a linear model predicting actual AP exam score based on the student's PSAT score, using the `apdata_clean` dataset. Store the model as `mod1`.
+
+CodeGrade will check that you have the correct coefficients for the linear model, rounded to 5 decimal places.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG mod1 #
+
+### TYPE YOUR CODE BELOW ###
+mod1 <- lm(ACTUAL~PSAT,data = apdata_clean)
+
+### VIEW OUTPUT ###
+round(coefficients(mod1), 5)
+
+```
+
+## Q16: With the `apdata_clean` dataset, use the predict function to predict the actual AP score for the student in the first row. Store the result in Q16.
+
+Do not hard code the answer! That is, do not simply have `Q16 <- {a number}`.
+
+See here for the [predict documentation](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/predict)
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q16 #
+
+### TYPE YOUR CODE BELOW ###
+Q16 <- predict(mod1,apdata_clean[1,])
+
+### VIEW OUTPUT ###
+Q16
+
+```
+
+## Q17: Find the regression summary of the linear model predicting actual AP exam score based on the student's PSAT score, using the `apdata_clean` dataset. Store the summary in Q17.
+
+Code Grade will check the 6th and 8th element in your summary. The 6th element is the standard deviation of the residuals ($sigma) and the 8th element is the coefficient of determination ($r.squared) from your summary.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q17 #
+
+### TYPE YOUR CODE BELOW ###
+Q17 <- summary(mod1)
+
+### VIEW OUTPUT ###
+Q17[c(6,8)]
+# 6: gives the value of sigma (aka StDev of residuals)
+# 8: gives the value of r-squared
+
+```
+
+## Q18: Find the correlation between the actual AP exam score and a student's PSAT score in the `apdata_clean` dataset. Store the result in Q18.
+
+Do not hard code the answer! That is, do not simply have `Q18 <- {a number}`.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q18 #
+
+### TYPE YOUR CODE BELOW ###
+Q18 <- cor(apdata_clean$ACTUAL,apdata_clean$PSAT)
+
+### VIEW OUTPUT ###
+Q18
+
+```
+
+## Q19: Based on the correlation, is there a weak, moderate, or strong association between these two variables? Store either "weak", "moderate" or "strong" in Q19.
+
+Hard-coding is intended here.
+
+```{r}
+### Do not change and do not delete the comment below. It is required for Code Grade to run properly.
+# CG Q19 #
+
+### TYPE YOUR CODE BELOW ###
+Q19 <- "moderate"
+
+### VIEW OUTPUT ###
+Q19
+
+```
+
+------------------------------------------------------------------------
+
+# Before submitting to Code Grade:
+
+1)  Clear objects from your workspace. Click the broom in the Environment pane in the top right. This will erase any objects (like Q1, Q2) that you've stored.
+
+2)  Rerun all your code. You can click the "Run" option in this script pane in the top right of the notebook, then select "Run all". You should have all the objects stored again in the environment pane, and you should see no red error messages in the console below.
+
+------------------------------------------------------------------------
+
+This material is for enrolled students' academic use only and protected under U.S. Copyright Laws. This content must not be shared outside the confines of this course, in line with Eastern University's academic integrity policies. Unauthorized reproduction, distribution, or transmission of this material, including but not limited to posting on third-party platforms like GitHub, is strictly prohibited and may lead to disciplinary action. You may not alter or remove any copyright or other notice from copies of any content taken from BrightSpace or Eastern University’s website. © Copyright Notice 2024, Eastern University - All Rights Reserved
