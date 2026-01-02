@@ -1,0 +1,577 @@
+---
+title: 'DTSC 650: Data Analytics In R'
+subtitle: 'CodeGrade Assignments Part 2: nycflights13Stats'
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+---
+
+## Student Info
+
+```         
+Name: 
+Term: 
+Date:
+```
+
+------------------------------------------------------------------------
+
+## General Instructions
+
+------------------------------------------------------------------------
+
+### Name of File
+
+Name your assignment file **`nycflights13Stats`**. This is a quarto "markdown" file, which has the file has the extension '.qmd'.
+
+------------------------------------------------------------------------
+
+### Allowable packages
+
+The only allowable packages are `tidyverse`, `nycflights13`, `lm.beta`, and `olsrr`. You should not use any other packages as CodeGrade is not set up to accept them on this assignment.
+
+-   If the allowable packages are not installed on your local computer, you'll need to do a one-time installation *from the Console Window in RStudio* for each package like this:\
+    **`install.packages('<package name>')`**\
+    *Do not attempt to install packages in code that you submit to CodeGrade.*
+
+-   Note: installing the entire tidyverse with `install.packages('tidyverse')` from the Console Window will save you from having to install any of the tidyverse's individual packages in the future.
+
+-   In your code, load the package's library like this: **`library(<library name>)`**
+
+------------------------------------------------------------------------
+
+### Data Set
+
+The data set for this assignment is called **`flights`**. See the [nycflights13 documentation](https://nycflights13.tidyverse.org/) for more info.
+
+------------------------------------------------------------------------
+
+### Pipe Notation
+
+You may use the `tidyverse` pipe **`%>%`** or the new base R pipe **`|>`**. See [here](https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/) for a comparison.
+
+You are expected to use pipe notation in all of the CodeGrade assignments. Although there are alternate ways to filter, subset, and summarize data sets, using the pipe creates more readable code and is an important skill to develop.
+
+------------------------------------------------------------------------
+
+### Rounding requirement
+
+-   Round all float/dbl values to two decimal places.
+
+------------------------------------------------------------------------
+
+### Dataframe vs. Tibble
+
+Typically, in CodeGrade assignments, we expect output to be dataframes, not tibbles, unless otherwise noted.
+
+------------------------------------------------------------------------
+
+### Inline vs. Console
+
+By default, RStudio uses Inline output (Notebook mode) on R Markdown documents. You can switch between Inline and Console output modes by clicking the gear button in the editor toolbar (to the left of the green "insert new code chunk") and choosing either "Chunk Output Inline" or "Chunk Output in Console". See [here](https://bookdown.org/yihui/rmarkdown/notebook.html#creating-a-notebook) for more information.
+
+Console output can be useful for debugging since that's how your solutions will appear to CodeGrade. You can type code directly into the Console as well and run it from there.
+
+------------------------------------------------------------------------
+
+### Requirement when using lm()
+
+For questions 6-10, your regressions must use the following structure: `lm([variable] ~ [variable], data = [dataset])`.
+
+CodeGrade will mark your work incorrect if you use the structure: `lm(dataset$variable1 ~ dataset$variable2)`.
+
+------------------------------------------------------------------------
+
+### Preliminaries
+
+```{r}
+### It's always a good idea when working in RStudio to start with a clean environment. 
+### Clear objects from the environment memory that may be leftover from previous versions of your code or other assignments by running the following line:
+rm(list = ls())
+
+### Load Libraries
+library(tidyverse) 
+library(nycflights13) 
+library(lm.beta)
+library(olsrr)
+flights_key <- flights
+### There may be warning messages about some of the packages. You can ignore these. Feel free to search online for the explanations for these messages.
+```
+
+## Context
+
+Suppose we are flying to our favorite vacation destination. Can we predict how long our arrival delay will be from our departure delay? Would knowing our departure delay and the distance to our destination provide a better prediction? What about knowing the airline (a.k.a., the  carrier) we're using? We will work to answer these questions through this assignment. You will be working with an imaginary analyst through the assignment.
+
+------------------------------------------------------------------------
+
+## Questions
+
+------------------------------------------------------------------------
+
+## Q1 An analyst plans to create a regression model predicting departure delay. Before doing so, the analyst wants to analyze the distribution of departure delays. Use the space below for your graphical and numerical analysis. Note the dimensions of the dataset. Also note how many NAs exist in the departure time, departure delay, arrival time, and arrival delay variables.
+
+```{r}
+# Use the space below for exploration
+
+```
+
+
+-   Store the summary of the departure delays variable in Q1.
+-   Your output should look something like this:
+
+```         
+    Min. 1st Qu.  Median   Mean  3rd Qu.    Max.    NA's 
+ [value] [value] [value] [value] [value] [value] [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q1 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+
+
+
+### VIEW OUTPUT ###
+Q1
+
+```
+
+## Q2 In the process of cleaning the data, the analyst notices that some of the flights in this dataset never left the airport (i.e., the flight was cancelled). Create a dataframe of cancelled flights with two columns (`carrier` and `cancellations`) that shows the total number of cancelled flights (`cancellations`) *for each carrier*. Order by the carrier with the most cancelled flights. 
+
+-   Assign the top 10 carriers with the most cancellations to Q2.
+-   We will assume any flight that never departed as being cancelled.
+-   Do not update the dataframe from Q1 with this information. Q2 is asking for a        separate dataframe.
+-   Your output should look something like this:
+
+```         
+carrier  cancellations
+EV       [value]
+MQ       [value]
+9E       [value]
+UA       [value]
+US       [value]
+AA       [value]
+B6       [value]
+DL       [value]
+WN       [value]
+FL       [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q2 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+### VIEW OUTPUT ###
+Q2
+
+```
+
+## Q3 Over a morning coffee with the analyst, the analyst says, "Let's create a clean version of the flights dataframe to use going forward. Create a new dataframe named `flights_clean` that has no rows with cancelled flights. And while we're at it, let's remove any rows with an NA in either the departure delay or arrival delay columns (or an NA in both)." You like the idea, and will sort the dataframe by departure delay (largest to smallest). 
+
+-   Select the departure time, departure delay, arrival time, and arrival delay columns from `flights_clean` and assign the first 10 rows to Q3.
+
+-   Your output should look something like this:
+
+```         
+   dep_time dep_delay arr_time arr_delay
+1   [value]      1301  [value]   [value]
+2   [value]   [value]  [value]   [value]
+3   [value]   [value]  [value]   [value]
+4      1139   [value]  [value]   [value]
+5   [value]   [value]  [value]   [value]
+6   [value]   [value]  [value]   [value]
+7   [value]   [value]      135   [value]
+8   [value]   [value]  [value]   [value]
+9   [value]   [value]  [value]   [value]
+10  [value]   [value]  [value]       878
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q3 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+
+
+  
+
+### VIEW OUTPUT ###
+Q3
+
+
+
+```
+
+
+### Q1-Q3 Check: The analyst recommends that we make sure all the NAs are gone in the arrival time, departure delay, and arrival delay columns. 
+
+```{r}
+# No NAs shown in the summaries
+summary(flights_clean$dep_delay) 
+summary(flights_clean$arr_delay) 
+summary(flights_clean$arr_time) 
+summary(flights_clean$dep_time) 
+
+# No NAs counted in the columns
+sum(is.na(flights_clean$dep_delay))
+sum(is.na(flights_clean$arr_delay))
+sum(is.na(flights_clean$arr_time))
+sum(is.na(flights_clean$dep_time))
+
+# No NAs counted in the columns, with more concise code
+sapply(flights_clean[c("dep_delay", 
+                       "arr_delay", 
+                       "arr_time", 
+                       "dep_time")], 
+       function(x) sum(is.na(x)))
+
+```
+
+### Visualization: The analyst is interested to get a visual check of two of the variables with your new `flights_clean` dataframe. Create an appropriate graphical display with ggplot2 showing the relationship between departure delay and arrival delay for the `flights_clean` dataframe. 
+
+-   This may take a minute depending on your computer specs, given the size of the       dataframe.
+-   This question is not scored by CodeGrade.
+
+```{r}
+
+
+```
+
+
+
+## Q4 Create a linear model using departure delay to predict arrival delay in the `flights_clean` dataframe. Remove any influential points (where `Cook's D > 0.005`) and save the new dataframe as `flights_no_IP`. Calculate the proportion of observations that remain between this new dataframe and the original `flights` dataframe. Store the proportion, rounded to three decimal places, as Q4.
+
+-   Your answer should be a proportion, a number between 0 and 1.
+-   You may use the `olsrr` library to investigate influential points.
+
+```         
+[1] 0.xxx  
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q4 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+
+
+### VIEW OUTPUT ###
+Q4
+
+
+```
+
+### Optional Investigation: Identify the top three influential points (according to Cook's D) and see if there is anything interesting about these observations.
+
+```{r}
+flights_no_IP[c(7009, 240227, 251920),c("carrier", "flight", "origin", "dest", "dep_delay", "arr_delay", "time_hour")]
+```
+
+
+
+## Q5 The analyst would like a correlation matrix for arrival delay, departure delay, air time, distance, and month, using the `flights_no_IP` dataframe. Given these correlations, what do you notice?
+
+-   Assign the correlation matrix to Q5.
+-   Make sure your columns match the order for those in the hint below.
+-   Round all correlations to 2 decimal places.
+-   Your output should look something like this:
+
+```         
+              arr_delay dep_delay     air_time    distance    month
+arr_delay      <value>  <value>       <value>     <value>     <value>
+dep_delay      <value>  <value>       <value>     <value>     <value>
+air_time       <value>  <value>       <value>     <value>     <value>
+distance       <value>  <value>       <value>     <value>     <value>
+month          <value>  <value>       <value>     <value>     <value>
+
+```
+
+
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q5 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+
+### VIEW OUTPUT ###
+Q5
+
+```
+
+
+## Q6 Using the `flights_no_IP` dataframe, run `cor.test` for the relationship between departure delay and arrival delay.
+
+-   Assign the results of the `cor.test()` function call to Q6.
+-   Is there statistically significant evidence that the correlation is not zero?
+-   Do not round.
+-   Your output should look something like this:
+
+```         
+    Pearson's product-moment correlation
+
+data:  <variable> and <variable>
+t = [value], df = [value], p-value < [value]
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ [value] [value]
+sample estimates:
+    cor 
+[value]
+```
+
+
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q6 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+### VIEW OUTPUT ###
+Q6
+
+```
+
+## Q7 "Finally," the analyst exclaims, "we can make a predictive model." Using the `flights_no_IP` dataframe, create a regression with departure delay as the explanatory variable (i.e., predictor) and arrival delay as the response variable. 
+
+-   As mentioned in the directions, to match CodeGrade properly, be sure to use the      `data = flights_no_IP` argument in the regression model here and below.
+-   The summary of the model should be assigned to Q7.
+-   Do not round.
+-   Your output should look something like this:
+
+```         
+Call:
+lm(formula = <variable> ~ <variable>, data = <name>)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+[value] [value] [value] [value] [value] 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept) [value]   [value]  [value]   [value]
+dep_delay   [value]   [value]  [value]   [value]
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: [value] on [value] degrees of freedom
+Multiple R-squared:  [value],   Adjusted R-squared:  [value] 
+F-statistic: [value] on [value] and [value] DF,  p-value: < [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q7 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+
+
+
+
+### VIEW OUTPUT ###
+Q7
+
+```
+
+## Q8 The analyst recommends using more than one predictor to understand arrival delays. Using the `flights_no_IP` dataframe, create another regression, this time adding distance as a predictor to the regression from Q7.
+
+-   The summary of the model should be assigned to Q8.
+-   Do not round.
+-   Your output should look something like this:
+
+```         
+Call:
+lm(formula = <vaiable> ~ <vaiable> + <vaiable>, data = <vaiable>)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+[value] [value] [value] [value] [value]
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   [value]  [value]  [value]   [value]
+<variable>    [value]  [value]  [value]   [value]
+<variable>    [value]  [value]  [value]   [value]
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: [value] on [value] degrees of freedom
+Multiple R-squared:  [value],   Adjusted R-squared:  [value] 
+F-statistic: [value] on 2 and [value] DF,  p-value: < [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q8 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+
+
+
+
+### VIEW OUTPUT ###
+Q8
+
+
+
+```
+
+## Q9 Since the predictors in Q8 have different units and scales, the analyst is interested to see the standardized regression coefficients. Using the `flights_no_IP` dataframe, calculate standardized regression coefficients with `lm.beta` for the regression from Q8. 
+
+-   Assign the output of `lm.beta()` to Q9.
+-   What do the standardized coefficients tell us?
+-   Do not round.
+-   Your output should look something like this:
+
+```         
+Call:
+lm(formula = <variables>, data = <dataframe>)
+
+Standardized Coefficients::
+(Intercept)   <variable>    <variable> 
+         NA   [value]       [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q9 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+
+
+
+
+### VIEW OUTPUT ###
+Q9
+
+```
+
+## Q10 "I wonder if knowing the airline would help us predict arrival delays?" the analyst asks. Using the `flights_no_IP` dataframe, create another regression, this time adding carrier as an additional predictor to the regression from Q8. Store the model as `mod1` and the summary to Q10.
+
+-   The summary of the model should be assigned to Q10.
+-   Do not round.
+-   Your output should look something like this:
+
+```         
+Call:
+lm(formula = <variable> ~ <variable> + <variable> + <variable>, data = <variable>)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+[value] [value] [value] [value] [value] 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)    [value]    [value] [value]  [value]
+<coefficientx> [value]    [value] [value]  [value]
+...
+...
+<coefficientx> [value]    [value] [value]  [value]
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: [value] on [value] degrees of freedom
+Multiple R-squared:  [value],   Adjusted R-squared:  [value] 
+F-statistic:  [value] on [value] and [value] DF,  p-value: < [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q10 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+
+
+### VIEW OUTPUT ###
+Q10
+
+
+```
+
+## Q11 "What good is a model if we don't make a prediction with it?" the analyst quips. Use the regression model `mod1` from Q10 and the `predict` function to predict the arrival delay, in minutes, for an American Airlines (AA) plane that has 250 miles to its destination and a 30-minute departure delay. Store the prediction in Q11.
+
+-   The prediction should be assigned to Q11. 
+-   Do not round.
+-   Your output should look something like this:
+
+```         
+       1 
+xx.xxxxx 
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q11 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+
+
+### VIEW OUTPUT ###
+Q11
+```
+
+------------------------------------------------------------------------
+
+# Before submitting to Code Grade:
+
+1)  Clear objects from your environment. Click the broom in the Environment pane in the top right. This will erase any variables (like Q1, Q2) that you've stored.
+
+2)  Rerun all your code. You can click the "Run" option above in this script pane (top right of notebook), then select "Run all". You should have all the variables stored again in the environment pane, and you should see no red error messages in the console below.
+
+------------------------------------------------------------------------
+
+This material is for enrolled students' academic use only and protected under U.S. Copyright Laws. This content must not be shared outside the confines of this course, in line with Eastern University's academic integrity policies. Unauthorized reproduction, distribution, or transmission of this material, including but not limited to posting on third-party platforms like GitHub, is strictly prohibited and may lead to disciplinary action. You may not alter or remove any copyright or other notice from copies of any content taken from BrightSpace or Eastern University's website.
+
+© Copyright Notice 2024, Eastern University - All Rights Reserved
+
+####################################################################
+####################################################################
+
+# Optional Investigation:
+
+## There are 1175 NAs in the arrival delay column in the original `flights` dataframe. It would seem that these NAs can actually be calculated using the arrival time and the scheduled arrival time. If we can figure out a way to calculate values in this column, we would be able to retain 9000+ rows of our dataframe. The issue, however, is properly subtracting the arrival time and the scheduled arrival time, particularly dealing with times that are in different days (i.e., the arrival time was 11:30pm but arrived at 12:30am).
+
+```{r}
+flights |> 
+  filter(is.na(arr_delay)) |> 
+  arrange(dep_delay)
+```
+
+The following work is "in progress", but it is not complete and not correct. I'll leave it here to see if you can figure out the issue.
+
+```{r}
+flights |> 
+  mutate(arr_delay2 = arr_time - sched_arr_time) |>  
+  #THIS ISN'T CORRECT --- doesn't factor in that there are 60 min per hour
+  mutate(min_til_midnight = 2400 - sched_arr_time) |> 
+  #THIS ISN'T CORRECT given 60 min/hr
+  select(arr_time, sched_arr_time, arr_delay2, min_til_midnight) |>
+  arrange(arr_delay2)
+```
+
+
+

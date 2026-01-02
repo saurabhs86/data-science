@@ -1,0 +1,512 @@
+---
+title: 'DTSC 650: Data Analytics In R'
+subtitle: 'CodeGrade Final Project Part 2'
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+---
+
+## Student Info
+
+```         
+Name: Saurabh Sinha
+Term: Fall 25
+Date: 10/10/25
+```
+
+------------------------------------------------------------------------
+
+## General Instructions
+
+------------------------------------------------------------------------
+
+### Academic Integrity
+
+We expect all work conducted at Eastern University to reflect honest and ethical behavior. The primary rule for ensuring academic integrity is that all submitted work must be original and produced by the individual student.
+
+To uphold academic integrity, it is not permitted to view another student's work prior to submitting your own, nor should you provide your work to someone who has not yet submitted their work. Collaborating with other students is only allowed when seeking clarification on a topic or assignment instructions. 
+
+See the syllabus for more information.
+
+### Name of File
+
+Name your assignment file **`Final_Project_Part2.qmd`**. This is a quarto "markdown" file, which has the extension ".qmd".
+
+------------------------------------------------------------------------
+
+### Instructions
+
+For the final section, you will choose four variables to explore. These four variables must be *different* than the three analyzed in Q1-10. Select one of the four variables you chose as the response variable and the other three as predictors. Be sure to read through all of the instructions for Q11-Q15 before choosing your 4 variables.
+
+Feel free to create multiple variables for Q12, Q13, and Q14, e.g. Q12a, Q12b, etc. Please make it clear, though, the distinction between each question/problem with comments, spacing, and new code chunks. If you use Q12a, b, etc., be sure to print the results by doing Q12a or print(Q12a). It is allowable to use `print()` on this part. Your answers must be clearly identifiable.
+
+Take time to tidy your code once you are finished. The easier it is for us to understand, the more credit you could receive.
+
+------------------------------------------------------------------------
+
+### Allowable packages
+
+The only allowable packages are `tidyverse`, `caret`, `Hmisc`, `lsr`, `olsrr`, `psych`, `lm.beta`, `car`, `nnet`, `corrplot`, `corrgram`, `correlationfunnel`, `DataExplorer`, `conflicted`, `ppcor`, `skimr`, `plotly`, `gridExtra`, `lmtest`, `fastDummies`, `yardstick`.
+
+-   If the allowable packages are not installed on your local computer, you'll need to do a one-time installation *from the Console Window in RStudio* for each package like this:
+
+    **`install.packages('<package name>')`**
+
+    *Do not attempt to install packages in code that you submit to CodeGrade.*
+
+-   Note: installing the entire tidyverse with `install.packages('tidyverse')` from the Console Window will save you from having to install any of the tidyverse's individual packages in the future.
+
+-   In your code, load the package's library like this: **`library(<library name>)`**
+
+------------------------------------------------------------------------
+
+### Do / Do not
+
+-   Do use tidyverse functions (e.g., dplyr verbs) for all of the questions where possible.
+
+-   Do use The Pipe, either `%>%` or `|>`.
+
+-   Do use plenty of comments throughout your code chunks so that the grader can follow your line of thinking.
+
+-   Do use the "Q Discussion:" sections provided to explain your thinking and to answer the questions.
+
+-   Do not rearrange data frame outputs unless specified by the question instructions.
+
+-   Do not create multiple copies of the BRFSS dataset in your script. 
+
+-   Do have integrity and submit your own work, not the work of a classmate, an online resource, or someone else.
+
+-   Do not edit the CSV file in Excel, Numbers, Sheets, etc.
+
+
+------------------------------------------------------------------------
+
+### Submission
+
+You only have ONE ATTEMPT to submit Part 2 to the ACTUAL submission link! On all the other assignments, you got multiple attempts; but not on this assignment.
+
+Ensure you are ready and confident in your work before submitting.
+
+------------------------------------------------------------------------
+
+### Data Set
+
+-   These data come from the [Centers for Disease Control](www.cdc.gov)
+
+-   To answer these questions you will need to use the codebook on Brightspace, called `BRFSS_2021 Codebook`. For part 2 of the project, please note that not all of the variables listed in the codebook are included in the .csv file to be downloaded from Brightspace.
+
+-   Download the `brfss2021.csv` file from Brightspace and place it in the same folder/directory as your script file. Then in RStudio, set your Working Directory to your Source File location: in the menus choose Session \| Set Working Directory \| To Source File Location. You most likely will see some warnings after it loads due to the fact that `read_csv()` will try to guess the column type but because there are so many rows it won't read enough of them to accurately make a guess.
+
+-   You must use the `read_csv()` function when loading the .csv file. Do not use read.csv().
+
+-   Do not rename the .csv file that you download from Brightspace.
+
+-   Do not edit the .csv file.
+
+------------------------------------------------------------------------
+
+### Pipe Notation
+
+You may use the `tidyverse` pipe **`%>%`** or the new base R pipe **`|>`**. For a comparison, see [here](https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/).
+
+You are expected to use pipe notation in all of the CodeGrade assignments. Although there are alternate ways to filter, subset, and summarize data sets, using the pipe creates more readable code and is an important skill to develop.
+
+------------------------------------------------------------------------
+
+### Comments vs. Discussion
+
+You should include both comments within your code chunk as well a discussion after each coded answer. Comments explain your code and your thought process; the discussion uses your code to answer the questions we've asked. We have provided "Q Discussion" sections for each question. Feel free to add more lines in the discussion section.
+
+You can also use markdown headers to organize your discussion and the outline. For more info on markdown, see [here](https://rmarkdown.rstudio.com/authoring_basics.html)
+
+------------------------------------------------------------------------
+
+### Rounding requirement
+
+Unlike Part 1, there is no rounding requirement. Use your best judgment.
+
+------------------------------------------------------------------------
+
+### Dataframe vs. Tibble
+
+Unlike Part 1, there is no dataframe requirement.
+
+------------------------------------------------------------------------
+
+## Questions and Coded Solutions
+
+------------------------------------------------------------------------
+
+### Preliminaries
+
+```{r}
+### It's always a good idea when working in RStudio to start with a clean environment. 
+
+### Clear objects from the environment memory that may be leftover from previous versions of your code or other assignments by running the following line:
+rm(list = ls())
+
+### Load the libraries you need
+
+library(tidyverse) 
+library(psych)
+library(lm.beta)
+
+
+
+
+### Load the Data
+### Load the data file
+### Do not change this line
+brf <- read_csv("brfss2021.csv", show_col_types = FALSE)
+
+```
+
+------------------------------------------------------------------------
+
+## Questions
+
+------------------------------------------------------------------------
+
+### Q11
+
+Address the values of each of the variables (use the codebook for this and include your answer as comments). For instance, is "none" equal to a value other than 0? Are there extra decimals implied? Are there other values that should be excluded based on the responses they represent? How will you handle NA values? Which variable will you seek to predict from the other variables? Answer these questions in the *Q11 Discussion:* section below the code chunk. Update the dataset to account for these values for the remainder of the questions.
+
+-   You don’t need to handle outliers at this stage. You can address them later in the project, often after your exploratory analysis or visualizations. Just make sure to handle them before building your models. If you choose not to remove any outliers for any reason, be sure to explain your reasoning.
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q11 # 
+
+### TYPE YOUR CODE BELOW ###
+#The 4 variables chosen are PHYSHLTH,MENTHLTH,EXERANY2,EDUCA
+#Response Variable : PHYSHLTH while rest 3 will be predictors 
+
+# select only those 4 columns from brf
+brf_Clean <- brf |>
+  select(PHYSHLTH,MENTHLTH,EXERANY2,EDUCA)
+
+#check for NAs
+#summary(brf_Clean)
+
+#Treat 88 code as 0 days for physical and mental data variable 
+#Ignore unknown rows like 'refused','don't know' 
+brf_Clean <- brf_Clean|>
+  mutate(
+    PHYSHLTH=if_else(PHYSHLTH==88,0,PHYSHLTH),
+    MENTHLTH=if_else(MENTHLTH==88,0,MENTHLTH),
+    EXERANY2=factor(EXERANY2),
+    EDUCA=factor(EDUCA)
+  )|>
+  filter(!PHYSHLTH %in% c(77,99),
+         !MENTHLTH %in% c(77,99),
+         !EXERANY2 %in% c(7,9),
+         !EDUCA %in% c(9)
+         )
+
+brf_Clean
+
+# Removing NA rows
+brf_Clean <-brf_Clean|>
+  na.omit()
+
+
+summary(brf_Clean) # all NA should be gone by now
+
+```
+
+### Q11 Discussion:
+
+Your Q11 discussion goes here. Feel free to add more lines as needed.
+
+The 4 variables chosen are PHYSHLTH,MENTHLTH,EXERANY2,EDUCA
+
+Response Variable : 
+PHYSHLTH: Number of days physical health was not good in the last 30 days 
+Values it can have: 1-30, 88, 77, 99 , Blank
+Will convert 88 to zero . Remove 77,99 and Blank
+
+Predictor Variables:
+MENTHLTH: Number of days mental health was not good in the last 30 days. 
+Values it can have: 1-30, 88, 77, 99 , Blank
+Will convert 88 to zero . Remove 77,99 and Blank
+
+EXERANY2: Participated in physical activity in last 30 days 
+Values it can have: 1, 2 , 7,9 , BLANK
+Keep 1 and 2 as binary . Remove rows 7,9 , Blank
+
+EDUCA: Education Level 
+Values it can have: 1, 2 ,3, 4, 5,6,9 , BLANK
+Keep as oridinal categorial variable,    Remove rows qith 9 , Blank
+
+End result shouldn't have any NAs after clean up
+
+
+### Q12
+
+Complete exploratory analyses (for each variable) doing appropriate visualizations with ggplot2. Include visualizations that incorporate a combination of your variables within one plot. Provide an organized discussion of your observations for each of the plots in the *Q12 Discussion* section below.
+
+-   You could consider handling outliers at this step. Remember to address them before creating models, and if you decide not to remove any, be sure to explain your reasoning.
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q12 # 
+
+### TYPE YOUR CODE BELOW ###
+
+# Perform exploratory visulaization on cleaned data 
+
+#Histogram of PHYSHLTH
+ggplot(brf_Clean, aes(x=PHYSHLTH))+
+  geom_histogram(binwidth = 1,fill="skyblue")+
+  labs(title="Days physical health not good", x="Days", y="Frequency")
+
+#Histogram of MENTHLTH
+ggplot(brf_Clean, aes(x=MENTHLTH))+
+  geom_histogram(binwidth = 1,fill="orchid")+
+  labs(title="Days mental health not good", x="Days", y="Frequency")
+
+#Bar plot for EXERANY2
+ggplot(brf_Clean, aes(x=EXERANY2))+
+  geom_bar(fill="green")+
+  labs(title="Physical activity in last 30 days ", x="Exercise", y="Count")
+
+#Bar plot for EDUCA
+ggplot(brf_Clean, aes(x=EDUCA))+
+  geom_bar(fill="orange")+
+  labs(title="Education Level Distribution ", x="Education Level", y="Frequency")
+
+#Boxplot for PHYSHLTH
+ggplot(brf_Clean, aes(x=PHYSHLTH))+
+  geom_boxplot(fill="yellow")+
+  labs(title="Physical health  ",  x="Physical health days")
+
+#Boxplot for MENTHLTH
+ggplot(brf_Clean, aes(x=MENTHLTH))+
+  geom_boxplot(fill="brown")+
+  labs(title="Physical health  ",  x="Mental health days")
+
+
+#Boxplot for PHYSHLTH by EDUCA
+ggplot(brf_Clean, aes(x=EDUCA, y=PHYSHLTH))+
+  geom_boxplot(fill="purple")+
+  labs(title="Physical health by Education level ", x="Education Level", y="Physical health days")
+
+#Boxplot for MENTHLTH by EDUCA
+ggplot(brf_Clean, aes(x=EDUCA, y=MENTHLTH))+
+  geom_boxplot(fill="red")+
+  labs(title="Physical health by Education level ", x="Education Level", y="MENTHLTH health days")
+
+#Scatter plot for PHYSHLTH vs MENTHLTH  by EDUCA # its taking time to process, so commenting out
+#ggplot(brf_Clean, aes(x=EDUCA, y=PHYSHLTH,colour = EXERANY2))+
+#  geom_point(alpha=0.6)
+# labs(title="Physical health by Education level ", x="Education Level", y="Physical health days", color="Exercise")
+
+
+```
+
+### Q12 Discussion:
+
+Your Q12 discussion goes here. Feel free to add more lines as needed.
+
+PHYSHLTH histogram: look for skewness or clustering in days.  Most of the answers for PHYSHLTH are around 0
+MENTHLTH histogram: look for skewness or clustering in days.  Most of the answers for MENTHLTH are around 0
+
+EXERANY2 bar plot : compare exercise participation rates. Compare distribution for EXERANY2. more than 75% people say that they excerise in last 30 days. 
+EDUCA bar plot : compare education achieved rates. Compare distribution for EDUCA. Majority have education level have atleast high school graduate 
+
+PHYSHLTH box plot: Look for the outliners and 3rd quartile . We can see most of PHYSHLTH lies between 0-2 
+MENTHLTH box plot: Look for the outliners and 3rd quartile . We can see most of MENTHLTH lies between 0-4  
+scatterplot: correlation between mental, physical and how exercise helps it.
+
+### Q13
+
+Run all of the appropriate basic descriptive statistics for each of your variables. What do these statistics reveal? Be sure to address each variable in the "Q13 Discussion" below.
+
+-   Now is the time to handle outliers if you haven’t done so already. Remember to address them before creating models, and if you decide not to remove any, be sure to explain your reasoning.
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q13 # 
+
+### TYPE YOUR CODE BELOW ###
+
+#Descriptive stats for numerical variables 
+
+summary(brf_Clean$PHYSHLTH)
+summary(brf_Clean$MENTHLTH)
+
+sd(brf_Clean$PHYSHLTH)
+sd(brf_Clean$MENTHLTH)
+
+#Frequency tables for categorical and numerical variables 
+
+table(brf_Clean$PHYSHLTH)
+table(brf_Clean$MENTHLTH)
+
+table(brf_Clean$EXERANY2)
+table(brf_Clean$EDUCA)
+
+
+# correlation coefficient between PHYSHLTH MENTHLTH
+cor(brf_Clean$PHYSHLTH,brf_Clean$MENTHLTH)
+# Remove outliner if any 
+ 
+#function to remove outliner
+outliners_remove <-function(x){
+  q1 <-quantile(x,0.25,na.rm=TRUE )
+  q3 <-quantile(x,0.75,na.rm=TRUE )
+  iqr <- q3-q1
+  lower <-q1 - 1.5*iqr
+  upper <-q3 + 1.5*iqr
+  x[x<lower|x>upper] <-NA
+  return(x)
+}
+
+#brf_Clean$PHYSHLTH <-outliners_remove(brf_Clean$PHYSHLTH)
+#brf_Clean$MENTHLTH <-outliners_remove(brf_Clean$MENTHLTH)
+
+#brf_Clean <-na.omit(brf_Clean)
+#Don't think we should get rid of outliners because its entirely possible if someone has been not well for a while both mentally and physically.
+#Hence will be not removing the outliners 
+summary(brf_Clean)
+
+```
+
+### Q13 Discussion:
+
+Your Q13 discussion goes here. Feel free to add more lines as needed.
+
+used summary and sd to understand central tendency and spread of PHYSHLTH and MENTHLTH
+Used table to access distribution of categorical variables EDUCA and EXERANY2
+correlation coefficient between PHYSHLTH MENTHLTH is 0.309 which is further from 1. Doesn't indicate strong relationship.
+Normally Outliner can be removed before creating the regression model as they could be data entry error.
+But don't think outliners should be removed because its entirely possible if someone has been not well for a while . Holds true for both mentally and physically.
+Hence will be not removing the outliners 
+
+### Q14
+
+Run at least *3* different, appropriate regressions predicting the response variable you indicated in Q11. Include contextual interpretation of the regression coefficients for each model. Identify the best model using appropriate model diagnostics. Provide a discussion of your observations in the *Q14 Discussion* section provided below. Be organized and detailed in your discussions and commenting.
+
+-   These regressions should use different predictors. For example, the first model may use predictor A, model 2 uses predictors A & B, and model 3 uses predictors A & C and their interaction.
+
+-   Since we only have three predictors in this project, do not use backward elimination, forward elimination, or stepwise selection for your models.
+
+-   You won't be penalized if all models perform poorly. Still select the best one, justify your choice, and explain why all may have underperformed.
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q14 # 
+
+### TYPE YOUR CODE BELOW ###
+
+#Model with PHYSHLTH MENTHLTH 
+model1 <- lm(data=brf_Clean, PHYSHLTH ~ MENTHLTH)
+AIC(model1)
+summary(model1)
+
+#Model with PHYSHLTH MENTHLTH EXERANY2
+#contrasts(brf_Clean$EXERANY2)
+#EXERANY2 binary indicator : 1 exercised, 2 not exercised 
+model2 <- lm(data=brf_Clean, PHYSHLTH ~ MENTHLTH + EXERANY2)
+AIC(model2)
+summary(model2)
+#standarized model since units are different for the predictors
+summary(lm.beta(model2))
+
+
+#Model with PHYSHLTH MENTHLTH EDUCA interaction
+model3 <- lm(data=brf_Clean, PHYSHLTH ~ MENTHLTH * EDUCA )
+
+AIC(model3)
+summary(model3)
+#standarized model since units are different for the predictors
+summary(lm.beta(model3))
+
+#compare model through AIC
+AIC(model1,model2,model3)
+
+#model 2 comes out as the best 
+```
+
+### Q14 Discussion:
+
+Your Q14 discussion goes here. Feel free to add more lines as needed.
+
+Model 1 : Simple linear regression . Coefficient of MENTHLTH shows how mental health days  relate to phyical health days  . low p value shows that MENTHLTH is significant and useful. Low R square suggests the mental health alone doesn't explain much of the variance in physical health.Other factors likely play a role. F statistics is high, indicating model is statistically significant overall.
+
+Model 2 : Add EXERANY2 to see if exercise modifies the relationship . p value shows that MENTHLTH and EXERANY2 are both significant and useful. still  R square is not closer to one, so might not be a strong predictors/related. Indivduals who didn't exercised (EXERANY2=2) have 4.02 more days of poor physical health compared to those who exercised, holding mental health constant. Residual fit us slightly better that model1 indicating a improved fit. F statistics is high indicating model is statistically significant. Exercise is a strong predictor of physical health . Mental health remains a significant contributor ,though its effect size has reduced compared to model1.
+
+Model 3: includes interaction with EDUCA to access how education level moderates the effect mental health. p value shows that MENTHLTH and few EDUCA are significants and useful . Still adjusted R square is not closer to one, so might not be a strong predictors/related. Education moderates the relationship between mental and physical health. Indivdual with higher education experience less physical impact from poor mental health. 
+
+Model selection: Use AIC to compare. Lower AIC = better fit. 
+Model 2 performs best across all the metrics.
+highest R squared & adjusted R squared
+lowest AIC and residual standard error. 
+
+### Q15
+Using the best model you chose in Q14, make at least *3* predictions for different individuals for your chosen response variable. Use the discussion space below to note observations about the model's predictions. 
+
+-   We recommend using the `predict()` function and a dataframe with the 3 sets of values for the predictor variables you chose in Q11.
+
+-   For example, if your predictors were temperature, humidity, and wind speed, you need 3 individuals with values for each of those variables.
+
+-   Include clear contextual interpretation of those predictions in your discussion.
+
+-   Provide a valid discussion based on the predictions, addressing their reliability and any limitations of the model.
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q15 # 
+
+### TYPE YOUR CODE BELOW ###
+
+#data to try on the model 2 with 
+new.data<- data.frame(
+  MENTHLTH =c(5,15,25),
+  EXERANY2=factor(c(1,2,1))
+  
+)
+
+#prediction for the new data 
+predictions <-predict(model2,newdata = new.data)
+predictions
+
+#prediction with confidence 
+predictions_ci <- predict(model2,newdata = new.data, interval = "confidence",level = 0.95)
+predictions_ci
+```
+
+
+### Q15 Discussion:
+
+Your Q15 discussion goes here. Feel free to add more lines as needed.
+Interpretation:
+Prediction 1: 5 mental health days ,bit of exercise-> lower physical health burden
+Prediction 2: 15 mental health days with no exercise  -> moderate physical health burden
+Prediction 3: 25 high mental health days ,but with exercise -> moderate physical health burden
+
+Exercise has a protective effect. Not exercising adds significantly to the predicted poor physical health days.
+
+ALso calculated is the confidence interval at 95% . The confidence level for each calculated to give a more real picture 
+
+Assumptions: The model assumes linear relationship. real world health might be non-linear. 
+Limitation: Low R squared. Despite the best of 3, the R-squared value remains low, meaning most of the variation in physical health days is not explained by mental and exercise alone.  Binary exercise value doesn't capture the intensity or frquency of the exercise. 
+Model is a good starting point, adding more related predictors will help the cause. 
+
+------------------------------------------------------------------------
+
+# Before submitting to Code Grade:
+
+1)  Clear objects from your environment. Click the broom in the Environment pane in the top right. This will erase any variables (like Q11, Q12) that you've stored.
+
+2)  Rerun all your code. You can click the "Run" option above in this script pane (top right of notebook), then select "Run all". You should have all the variables stored again in the environment pane, and you should see no red error messages in the console below.
+
+3)  **Important**: You only have ONE ATTEMPT to submit Part 2 to the ACTUAL submission link! Ensure you are ready and confident in your work before submitting.
+
+4)  Reread all the directions and questions and make sure you addressed each part carefully, clearly, and thoughtfully.
+
+------------------------------------------------------------------------
+
+This material is for enrolled students' academic use only and protected under U.S. Copyright Laws. This content must not be shared outside the confines of this course, in line with Eastern University's academic integrity policies. Unauthorized reproduction, distribution, or transmission of this material, including but not limited to posting on third-party platforms like GitHub, is strictly prohibited and may lead to disciplinary action. You may not alter or remove any copyright or other notice from copies of any content taken from BrightSpace or Eastern University's website.
+
+© Copyright Notice 2024, Eastern University - All Rights Reserved

@@ -1,0 +1,680 @@
+---
+title: 'DTSC 650: Data Analytics In R'
+subtitle: 'CodeGrade Assignments Part 1: Formula 1'
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+---
+
+## Student Info
+
+```         
+Name: 
+Term: 
+Date:
+```
+
+------------------------------------------------------------------------
+
+## General Instructions
+
+------------------------------------------------------------------------
+
+### Name of File
+
+Name your assignment file **`Formula1.qmd`**. This is a quarto "markdown" file, which has the file extension '.qmd'.
+
+------------------------------------------------------------------------
+
+### Allowable packages
+
+The only allowable package is `tidyverse`. You should not use any other packages as CodeGrade is not set up to accept them on this assignment.
+
+-   If the allowable packages are not installed on your local computer, you'll need to do a one-time installation *from the Console Window in RStudio* for each package like this:\
+    **`install.packages('<package name>')`**\
+    *Do not attempt to install packages in code that you submit to CodeGrade.*
+
+-   Note: installing the entire tidyverse with `install.packages('tidyverse')` from the Console Window will save you from having to install any of the tidyverse's individual packages in the future.
+
+-   In your code, load the package's library like this: **`library(<library name>)`**
+
+------------------------------------------------------------------------
+
+### Data Set
+
+The dataset for this assignment consists of information from Formula 1 races, drivers, constructors (teams), qualifying, circuits, lap times, pit stops, and championships from 1950 to 2023. The source of the data is the Ergast Developer API (an experimental web service which provides a historical record of motor racing data for non-commercial purposes). The Ergast data is presented using a database philosophy (multiple related tables with foreign keys). We will use modified versions of a subset of the tables (as csv files available for download on Brightspace) and create a customized dataframe for our investigative purposes.
+
+-   You will need to download `Formula1Data.zip` from Brightspace and unzip the csv files into the same folder/directory as your QMD template.
+
+------------------------------------------------------------------------
+
+### Pipe Notation
+
+You may use the `tidyverse` pipe **`%>%`** or the new base R pipe **`|>`**. See [here](https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/) for a comparison.
+
+You are expected to use pipe notation in all of the CodeGrade assignments. Although there are alternate ways to filter, subset, and summarize data sets, using the pipe creates more readable code and is an important skill to develop.
+
+------------------------------------------------------------------------
+
+### Rounding requirement
+
+-   Round all float/dbl values to two decimal places.
+
+------------------------------------------------------------------------
+
+### Dataframe vs. Tibble
+
+Typically, in CodeGrade assignments, we expect output to be dataframes, not tibbles, unless otherwise noted.
+
+------------------------------------------------------------------------
+
+### Inline vs. Console
+
+By default, RStudio uses Inline output (Notebook mode) on R Markdown documents. You can switch between Inline and Console output modes by clicking the gear button in the editor toolbar (to the left of the green "insert new code chunk") and choosing either "Chunk Output Inline" or "Chunk Output in Console". See [here](https://bookdown.org/yihui/rmarkdown/notebook.html#creating-a-notebook) for more information.
+
+Console output can be useful for debugging since that's how your solutions will appear to CodeGrade. You can type code directly into the Console as well and run it from there. For example: after you run the Q0 example code inline (shown below), you can type `Q0<ENTER>` in the Console to see how the output appears to CodeGrade.
+
+------------------------------------------------------------------------
+
+### Preliminaries
+
+Clear environment and load libraries.
+
+```{r}
+### It's always a good idea when working in RStudio to start with a clean 
+### environment. Clear objects from the environment memory that may be 
+### leftover from previous versions of your code or other assignments by 
+### running the following line:
+rm(list = ls())
+
+### Load Libraries
+library(tidyverse) 
+
+### There may be warning messages about some of the packages. You can 
+### ignore these. Feel free to search online for the explanations for 
+### these messages.
+
+```
+
+#### Load the various csv files.
+
+See here for `read_csv()` documentation: <https://readr.tidyverse.org/reference/read_delim.html>
+
+```{r}
+### read constructors.csv into the constructors dataframe
+circuits <- read_csv("circuits.csv", col_types = "nccccnnnc", na="\\N")
+
+### read constructors.csv into the constructors dataframe
+constructors <- read_csv("constructors.csv", col_types = "ncccc", na="\\N")
+
+### read drivers.csv into the drivers dataframe
+drivers <- read_csv("drivers.csv", col_types = "ncccccccc", na="\\N")
+
+### read qualifying.csv into the qualifying dataframe
+qualifying <- read_csv("qualifying.csv", col_types = "nnnnnncncncn", na="\\N")
+
+### read races.csv into the races dataframe
+races <- read_csv("races.csv", col_types = "nnnncccccccccccccc", na="\\N")
+
+### read results.csv into the results dataframe
+results <- read_csv("results.csv", col_types = "nnnnnnncnnncnnncnn", na="\\N")
+
+### read status.csv into the status dataframe
+status <- read_csv("status.csv", col_types = "nc", na="\\N")
+```
+
+#### Create a new column called `driverName` in drivers
+
+Create a `driverName` column in drivers by concatenating the driver's last name and first name with a comma separator. See here for `unite()` documentation: <https://tidyr.tidyverse.org/reference/unite.html>
+
+```{r}
+drivers <- drivers %>%
+  unite("driverName", surname:forename, sep = ", ")
+
+```
+
+#### Create the `raceResults` dataframe
+
+There are several columns with "Id" in the column name. These are foreign keys that link to the other tables/dataframes. To make our tasks a little easier in R, we're going to join the dataframes into a single dataframe called `raceResults`. We'll use the tidyverse dplyr function `left_join()` to match the id columns from two dataframes and pull in the columns with more meaningful data from the other dataframe. See here for documentation: <https://dplyr.tidyverse.org/reference/mutate-joins.html>
+
+```{r}
+### The standard use of left_join() is like this:
+newTable <- left_join(
+  x = results, 
+  y = drivers, 
+  by = "driverId", 
+  suffix = c("", "_driver")
+)
+
+```
+
+```{r}
+### Alternatively we can use the pipe and select/remove columns for the joined 
+### dataframe all at the same time. Because we're using the pipe, the `x`
+### argument of left_join() is understood to be the data from the pipe and we
+### use "." as a placeholder. 
+raceResults <- results %>%
+  left_join(
+    x = .,
+    y = drivers,            
+    by = "driverId", 
+    suffix = c("", "_driver")
+  ) %>%
+  select(-driverRef, -number_driver, -code, -dob, -nationality, -url)
+
+```
+
+##### Join statuses
+
+Let's do the same for `statusId`. Note we're piping data from our new dataframe `raceResults` and updating it so that we can keep the previous results:
+
+```{r}
+raceResults <- raceResults %>%
+  left_join(
+    x = .,
+    y = status, 
+    by = "statusId"
+  ) %>%
+  select(-statusId)
+```
+
+##### Join constructors
+
+Now we'll do `constructorID` but we'll use a cool trick: we can `select()` the columns from `constructors` in the pipe instead of removing them at the end. Also notice we're renaming the `name` column to `constructor`:
+
+```{r}
+raceResults <- raceResults %>%
+  left_join(
+    x = .,
+    y = select(
+      .data = constructors,
+      constructorId,
+      constructor = name
+    ),
+    by = "constructorId"
+  ) %>%
+  select(-constructorId)
+```
+
+##### Join races
+
+Next we'll join the `races` dataframe. Let's grab all of the columns from races except the two URL columns:
+
+```{r}
+raceResults <- raceResults %>%
+  left_join(
+    x = .,
+    y = select(
+      .data = races,
+      raceId,
+      year,
+      round,
+      circuitId,
+      raceName = name,
+      date
+    ),
+    by = "raceId"
+  )
+```
+
+##### Join circuits (race tracks)
+
+Now let's pull in information about the circuit using only name, location, and country. Also notice we're renaming the `name` column to `circuitName`:
+
+```{r}
+raceResults <- raceResults %>%
+  left_join(
+    x = .,
+    y = select(
+      .data = circuits,
+      circuitId,
+      circuitName = name,
+      location,
+      country
+    ),
+    by = "circuitId"
+  ) %>%
+  select(-circuitId)
+```
+
+##### Join qualifying
+
+Here we'll join the qualifying dataframe. Note we're using two Id fields to ensure this works properly.
+
+```{r}
+raceResults <- raceResults %>% 
+  left_join(
+    x=.,
+    y= select(
+      .data = qualifying,
+      qualifyId,
+      driverId,
+      raceId,
+      q1, q2, q3,
+      q1Millisecs, q2Millisecs, q3Millisecs
+    ),
+    by=c("driverId", "raceId")
+)
+```
+
+##### Select and rearrange the columns in `raceResults`
+
+Finally, lets cleanup `raceResults` by selecting only the columns we want and putting them in a better order:
+
+```{r}
+raceResults <- raceResults %>%
+  select(driverName, number, constructor, grid, position, positionText, 
+         positionOrder, points, laps, time, milliseconds, fastestLap, 
+         fastestLapTime, fastestLapSpeed, status, raceName, year, round, date,
+         circuitName, location, country, q1, q2, q3, q1Millisecs, q2Millisecs, 
+         q3Millisecs)
+```
+
+***From this point forward we'll work exclusively with the `raceResults` dataframe.***
+
+------------------------------------------------------------------------
+
+## Questions
+
+------------------------------------------------------------------------
+
+### Q1 Create a dataframe with only three columns: `driverName`, `positionOrder`, and `raceName`?
+
+-   Leave the resulting dataframe unsorted.
+
+-   Assign the first 10 rows of the dataframe to Q1. The output should look something like this:
+
+```         
+          driverName  positionOrder      raceName
+1      [value_string]       [value] [value_string]
+2      [value_string]       [value] [value_string]
+...
+10     [value_string]       [value] [value_string]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q1 # 
+
+### TYPE YOUR CODE BELOW ###
+Q1 <- raceResults |>
+  select(driverName,positionOrder, raceName)|>
+  slice_head(n=10)|>
+  as.data.frame()
+
+
+### VIEW OUTPUT ###
+Q1
+
+```
+
+### Q2 Create a dataframe with four columns (`driverName`, `circuitName`, `year`, `fastestLapSpeed`) and sort it by `fastestLapSpeed` (fastest to slowest).
+
+-   Do not round.
+-   Assign the first 10 rows of the dataframe to Q2. The output should look something like this:
+
+```         
+       driverName    circuitName    year fastestLapSpeed
+1  [value_string] [value_string] [value]         [value]
+2  [value_string] [value_string] [value]         [value]
+...
+10 [value_string] [value_string] [value]         [value]
+```
+
+-   FYI the `fastestLapSpeed` is actually the average speed over the entire fastest lap, not the highest speed achieved on the fastest lap. Formula 1 race cars often exceed speeds of 350 kph (217.5 mph).
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q2 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q2 <- raceResults |>
+  select(driverName,circuitName,year,fastestLapSpeed)|>
+  arrange(desc(fastestLapSpeed))|>
+  head(10)|>
+  as.data.frame()
+
+
+### VIEW OUTPUT ###
+Q2
+
+```
+
+### Q3 What is the name of the driver with the fastest lap *time* ever?
+
+-   Do not round.
+-   Your solution should be a 1x2 dataframe assigned to Q3. The output should look something like this:
+
+```         
+      driverName   fastestLapTime
+  1 [value_string] [value_string]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q3 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q3 <- raceResults |>
+  select(driverName,fastestLapTime)|>
+  arrange((fastestLapTime))|>
+  head(1)|>
+  as.data.frame()
+
+### VIEW OUTPUT ###
+Q3
+
+```
+
+### Q4 What is the name of the race with the most number of laps?
+
+-   Do not round.
+-   Your solution should be a 1x2 dataframe assigned to Q4. The output should look something like this:
+
+```         
+        raceName    laps
+1 [value_string] [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q4 # 
+
+### TYPE YOUR CODE BELOW ###
+Q4 <- raceResults |>
+  select(raceName,laps)|>
+  #arrange(desc(laps))|>
+  #head(1)|>
+  slice_max(laps,n=1)|>
+  distinct()|>
+  as.data.frame()
+
+
+
+### VIEW OUTPUT ###
+Q4
+
+```
+
+### Q5 Create a 3 column dataframe (`driverName`, `status`, and `raceName`) sorted by `driverName` that lists all drivers who didn't finish a race due to illness.
+
+-   Hint: you can use the base R function `unique()` to see all of the possible values of the categorical variable `status` which lists the driver's finishing status.
+
+-   Your solution should be a 3x3 dataframe assigned to Q5. The output should look something like this:
+
+```         
+       driverName         status       raceName
+1  [value_string] [value_string] [value_string]
+...
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q5 # 
+
+### TYPE YOUR CODE BELOW ###
+Q5 <- raceResults |>
+      filter(status=='Illness')|>
+      select(driverName,status,raceName)|>
+      arrange((driverName))|>
+  as.data.frame()
+
+
+
+
+### VIEW OUTPUT ###
+Q5
+
+```
+
+### Q6 Create a new Boolean column in `raceResults` named `finished` that will contain `TRUE` if the driver finished the race and `FALSE` if they did not finish. Place the new column directly after the `status` column.
+
+-   The `status` variable indicates the finishing status of a driver in a race. Possible values are `Finished`; `+1 Lap`, `+2 Laps`, etc. for how far behind the leader they finished; or whether they had an `Accident` or `Collision`, `Engine` trouble, or other mechanical failure like a `Fuel leak`, etc. which prevented them from finishing the race. There are 137 different values. Use `table(raceResults$status)` to view a frequency table of all of the possible values.
+
+-   If the `status` is `Finished` or the `status` starts with a `+` (`+1 Lap`, `+2 Laps`, etc. meaning they finished 1 or two whole laps behind the leader) then the value in the new variable `finished` should be `TRUE`, otherwise the value should be `FALSE`.
+
+-   After you create the new variable:
+
+    -   use pipes to select both the `status` and `finished` columns,
+    -   use the dplyr function [`slice_sample()`](https://dplyr.tidyverse.org/reference/slice.html) to select 10 sample rows
+
+-   Note: when you're testing your code, you must run the entire Q6 block each time so that `set.seed(44)` runs which will guarantee that `slice_sample()` gives you the same output every time.
+
+-   Assign the resulting 10 x 2 dataframe to Q6.
+
+-   The output should look something like this:
+
+```         
+            status finished
+1  Did not qualify     FALSE
+...
+8         Finished     TRUE
+...
+10       Collision    FALSE
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q6 # 
+
+### Set Random Number Seed
+### Do not edit this line:
+set.seed(44)
+
+### TYPE YOUR CODE BELOW ###
+raceResults <- raceResults|>
+# enter your code
+mutate(finished=ifelse(status=='Finished' | startsWith(status, "+")  , "TRUE", "FALSE"),.after = status)
+  
+  
+
+Q6 <- raceResults|>
+# enter your code
+  select(status,finished)|>
+  slice_sample(n=10)|>
+  as.data.frame()
+  
+  
+### VIEW OUTPUT ###
+Q6
+
+```
+
+### Q7 Convert any single letter values in `positionText` to the full text that it represents (found in the codebook).
+
+The `positionText` variable has numeric values for where a driver finished in a race: 1 for first, 2 for second, etc. But it also contains somewhat cryptic letter values for drivers who didn't finish the race. Read through the accompanying codebook (found on Brightspace) to find what each letter represents and then convert the letters to the full text (found in the codebook) that they represent. When you're finished, the `positionText` variable values should be a mix of numbers and full text - no single letters.
+
+-   Hint: there are six different letters that you will need to convert.
+-   Update the `positionText` variable in the `raceResults` dataframe.
+-   After you update `positionText`,
+    -   use pipes to select just the `positionText` column,
+    -   use the base R [`unique()`](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/unique) function to select only unique values from `positionText`,
+    -   and sort the results in descending order.
+-   Assign the resulting 39 x 1 dataframe to Q7.
+-   The output should look something like this:
+
+```         
+        positionText
+1     [value_string]
+2     [value_string]
+3     [value_string]
+4     [value_string]
+5     [value_string]
+6     [value_string]
+7            [value]
+...
+38                10
+39                 1
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q7 # 
+
+### TYPE YOUR CODE BELOW ###
+raceResults <- raceResults|>
+    mutate(positionText= (case_when(positionText == 'R' ~ 'Retired',
+                                         positionText == 'D' ~ 'Disqualified',
+                                         positionText == 'E' ~ 'Excluded',
+                                         positionText == 'W' ~ 'Withdrawn',
+                                         positionText == 'F' ~ 'Failed To Qualify',
+                                         positionText == 'N' ~ 'Not Classified' ,
+                                          TRUE ~ positionText 
+                                        )
+                         )
+    )
+# enter your code
+  
+  
+### After entering your code above to convert the single letter values 
+### in posistionText to full text, run the following code to assign the 
+### results to Q7 for CodeGrade:
+Q7 <- raceResults |>
+# enter your code
+  distinct(positionText)|>
+  arrange(desc(positionText))|>
+  as.data.frame()
+  
+
+### VIEW OUTPUT ###
+Q7
+
+```
+
+### Q8 List all drivers who have 10 or more race wins since 1960.
+
+-   Sort the dataframe by wins with the most wins first.
+-   To be clear: "since 1960" means including 1960
+-   Hint: there is no column in `raceResults` named `wins` so you will need to calculate/create it.
+-   Your solution should be a dataframe with two columns (`driverName` and `wins`) assigned to Q8.
+-   The output should look something like this:
+
+```         
+       driverName      wins
+1   [value_string]  [value]
+...
+32 Scheckter, Jody       10
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q8 # 
+
+### TYPE YOUR CODE BELOW ###
+Q8 <- raceResults |>
+      filter(year > 1959)|>
+      filter(position==1)|>
+      select(driverName,status,raceName,year)|>
+      group_by(driverName) |>
+      summarise(wins= n())|>
+      filter(wins>9)|>
+      select(driverName,wins) |>
+      arrange(desc(wins))|>
+  as.data.frame()
+        
+
+### VIEW OUTPUT ###
+Q8
+
+```
+
+### Q9 A "podium" finish is when a driver finishes in the top 3. List all drivers who have 5 or more podium finishes at the Monaco Grand Prix.
+
+-   Sort the dataframe by podiums from highest to lowest.
+-   Hint: there is no column in `raceResults` named `podiums` so you will need to calculate/create it.
+-   Your solution should be a dataframe with two columns (`driverName` and `podiums`) assigned to Q9.
+-   The output should look something like this:
+
+```         
+       driverName   podiums
+1   [value_string]  [value]
+...
+9  Scheckter, Jody        5
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q9 # 
+
+### TYPE YOUR CODE BELOW ###
+Q9 <- raceResults |>
+      filter(raceName == 'Monaco Grand Prix')|>
+      filter(position==1 |position==2 |position==3)|>
+      select(driverName,status,raceName,year)|>
+      group_by(driverName) |>
+      summarise(podiums= n())|>
+      filter(podiums>4)|>
+      select(driverName,podiums) |>
+      arrange(desc(podiums))|>
+  as.data.frame()
+
+
+
+
+### VIEW OUTPUT ###
+Q9
+
+```
+
+### Q10a Create a new column in `raceResults` named `win` that for each record contains a 1 if the driver won the race or a 0 if the driver did not win the race.
+
+```{r}
+### TYPE YOUR CODE BELOW ###
+
+raceResults <- raceResults|>
+# enter your code
+filter(!is.na(position))  |>
+mutate(win=ifelse(position==1  , 1, 0))
+
+
+### VIEW OUTPUT ###
+### There should be 25346 values equal to 0 and 1113 values equal to 1
+table(raceResults$win)
+```
+
+### Q10 List the variance, standard deviation, and average of wins by driver for drivers with at least 30 races.
+
+-   Your solution should be a dataframe with five columns (`driverName`,`races`, `winsVar`, `winsSd`, `winsAvg`) assigned to Q10.
+-   Round to four decimal places.
+-   Only include the first 10 rows.
+-   Sort winsAvg (highest to lowest).
+-   The output should look something like this:
+
+```         
+            driverName races winsVar winsSd winsAvg
+1         Fangio, Juan    58  0.2468 0.4968  0.4138
+...
+10      Moss, Stirling    73  0.1735 0.4166  0.2192
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q10 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q10 <- raceResults|>
+ select(driverName,status,raceName,year,win)|>
+  #na.omit()|>
+   group_by(driverName) |>
+   summarise(races=n())|>
+   filter(races>29)|>
+   select(driverName,races) |>
+    arrange(desc(winsVar))|>
+   as.data.frame()
+
+### VIEW OUTPUT ###
+Q10
+```
+
+------------------------------------------------------------------------
+
+# Before submitting to Code Grade:
+
+1)  Clear objects from your environment. Click the broom in the Environment pane in the top right. This will erase any variables (like Q1, Q2) that you've stored.
+
+2)  Rerun all your code. You can click the "Run" option above in this script pane (top right of notebook), then select "Run all". You should have all the variables stored again in the environment pane, and you should see no red error messages in the console below.
+
+------------------------------------------------------------------------

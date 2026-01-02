@@ -1,0 +1,524 @@
+---
+title: 'DTSC 650: Data Analytics In R'
+subtitle: 'CodeGrade Assignments Part 2: fastfoodStats'
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+---
+
+## Student Info
+
+```         
+Name:
+Term:
+Date:
+```
+
+------------------------------------------------------------------------
+
+## General Instructions
+
+------------------------------------------------------------------------
+
+### Name of File
+
+Name your assignment file **`fastfoodStats`**. This is a quarto "markdown" file, which has the file has the extension '.qmd'.
+
+------------------------------------------------------------------------
+
+### Allowable packages
+
+The only allowable packages are `tidyverse`, `openintro`, `car`, `olsrr`, and `lm.beta`. You will need to install it if you haven't already. You should not use any other packages as CodeGrade is not set up to accept them on this assignment.
+
+-   If the allowable packages are not installed on your local computer, you'll need to do a one-time installation *from the Console Window in RStudio* for each package like this:\
+    **`install.packages('<package name>')`**\
+    *Do not attempt to install packages in code that you submit to CodeGrade.*
+
+-   Note: installing the entire tidyverse with `install.packages('tidyverse')` from the Console Window will save you from having to install any of the tidyverse's individual packages in the future.
+
+-   In your code, load the package's library like this: **`library(<library name>)`**
+
+------------------------------------------------------------------------
+
+### Data Set
+
+The data set for this assignment is called **`fastfood`**. See the [fastfood documentation](https://www.openintro.org/data/index.php?data=fastfood) for more info.
+
+------------------------------------------------------------------------
+
+### Pipe Notation
+
+You may use the `tidyverse` pipe **`%>%`** or the new base R pipe **`|>`**. See [here](https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/) for a comparison.
+
+You are expected to use pipe notation in all of the CodeGrade assignments. Although there are alternate ways to filter, subset, and summarize data sets, using the pipe creates more readable code and is an important skill to develop.
+
+------------------------------------------------------------------------
+
+### Rounding requirement
+
+-   Round all float/dbl values to two decimal places.
+
+------------------------------------------------------------------------
+
+### Dataframe vs. Tibble
+
+Typically, in CodeGrade assignments, we expect output to be dataframes, not tibbles, unless otherwise noted.
+
+------------------------------------------------------------------------
+
+### Inline vs. Console
+
+By default, RStudio uses Inline output (Notebook mode) on R Markdown documents. You can switch between Inline and Console output modes by clicking the gear button in the editor toolbar (to the left of the green "insert new code chunk") and choosing either "Chunk Output Inline" or "Chunk Output in Console". See [here](https://bookdown.org/yihui/rmarkdown/notebook.html#creating-a-notebook) for more information.
+
+Console output can be useful for debugging since that's how your solutions will appear to CodeGrade. You can type code directly into the Console as well and run it from there.
+
+------------------------------------------------------------------------
+
+### Preliminaries
+
+```{r}
+### It's always a good idea when working in RStudio to start with a clean environment. 
+### Clear objects from the environment memory that may be leftover from previous 
+###   versions of your code or other assignments by running the following line:
+rm(list = ls())
+
+### Load Libraries
+library(tidyverse) 
+library(openintro) 
+library(lm.beta)
+library(olsrr)
+library(car)
+
+fastfood <- fastfood
+### There may be warning messages about some of the packages. You can ignore these. Feel free to search online for the explanations for these messages.
+```
+
+------------------------------------------------------------------------
+
+## Questions
+
+------------------------------------------------------------------------
+
+### Q0 Explore the dataset and note in particular any variables with missing values.
+
+```{r}
+fastfood
+```
+
+### Q1 Complete the following cleaning, in this order:
+
+A: Please use the following columns, in this order: Sonic, Subway, McDonalds, TacoBell, BurgerKing, Arbys, item, calories, total_fat, cholesterol, sodium, total_carb, fiber, sugar, protein.
+
+In storing the results of steps B-D below, name the new dataframe `fastfood_df`. 
+B. Create a new column based on the `restaurant` column: If the restaurant is Sonic, have a 1; otherwise a 0. Name the new variable with the restaurant name.
+(Note: See A above for spelling and spacing of new column names, and always pay VERY close attention to how the restaurant names were coded originally)
+
+C. Repeat step 1 above for all the restaurants, but skip Dairy Queen and Chick Fil-A. Again, use correct spelling and spacing of new column names. 
+(Note: the new column names may not match the dataframe's original restaurant names or spacing; again pay VERY close attention to this)
+
+D. Finally, calculate the mean calories for McDonalds compared to restaurants that are not McDonalds.
+
+- Store the mean calorie results in Q1.
+- Note: Do not use the `fastDummies` library.
+- Note: Do not remove any NAs at this step.
+
+Your output should look something like this:
+
+```         
+McDonalds     MeanCal
+<dbl>         <dbl>
+0             <value>         
+1             <value>
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q1 # 
+### TYPE YOUR CODE BELOW ###
+
+fastfood_df <- fastfood |>
+  mutate(
+    Sonic = case_when(
+      restaurant == "Sonic" ~ 1,
+      .default = 0  # Retain original value if not matched
+    ),
+     Subway = case_when(
+      restaurant == "Subway" ~ 1,
+      .default = 0  # Retain original value if not matched
+    ),
+     McDonalds = case_when(
+      restaurant == "Mcdonalds" ~ 1,
+      .default = 0  # Retain original value if not matched
+    ),
+     TacoBell = case_when(
+      restaurant == "Taco Bell" ~ 1,
+      .default = 0  # Retain original value if not matched
+    ),
+     BurgerKing = case_when(
+      restaurant == "Burger King" ~ 1,
+      .default = 0  # Retain original value if not matched
+    ),
+     Arbys = case_when(
+      restaurant == "Arbys" ~ 1,
+      .default = 0  # Retain original value if not matched
+    )
+  )|>
+  select (Sonic, Subway, McDonalds, TacoBell, BurgerKing, Arbys, item, calories, total_fat, cholesterol, sodium, total_carb, fiber, sugar, protein)|>
+  as.data.frame()
+
+Q1 <- fastfood_df |>
+    select(calories,McDonalds) |>
+    group_by(McDonalds)|>
+    summarise(MeanCal=round(mean(calories),2)) |>
+    as.data.frame()
+
+### VIEW OUTPUT ###
+Q1
+```
+
+### Q2 Determine which two variables in the fastfood_df contain at least one NA. Make a dataframe of only rows in the `fastfood_df` with at least one NA in either of the two variables you identified. Store the `summary()` of these two variables in Q2.
+
+Your output should look something like this:
+
+```         
+<variable name>          <variable name>    
+ Min.   : <value>       Min.   : <value>  
+ 1st Qu.: <value>       1st Qu.: <value>  
+ Median : <value>       Median : <value>  
+ Mean   : <value>       Mean   : <value>  
+ 3rd Qu.: <value>       3rd Qu.: <value>  
+ Max.   : <value>       Max.   : <value>  
+ NA's   : <value>       NA's   : <value>  
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q2 # 
+### TYPE YOUR CODE BELOW ###
+
+#summary(fastfood_df)
+fastfood_df_na <- fastfood_df |>
+  select(protein,fiber) |>
+  filter((is.na(protein)|is.na(fiber)))|>
+  as.data.frame()
+
+Q2 <- summary(fastfood_df_na)
+
+### VIEW OUTPUT ###
+Q2
+```
+
+### Q3A Some of the NAs you discovered in Q2 can be resolved with an online search. We found the following information about the number of grams of fiber and protein in various items that had `NA` in the data set. Run the following codechunk to update your `fastfood_df` dataframe. We will call this new dataframe `fastfood_clean` and use it in the following questions.
+
+Fiber amounts: 
+- Burger King Mushroom & Swiss King 0 
+- Burger King Chicken Parmesan Sandwich 0 
+- Burger King Spicy chicken Nuggets 2 
+- Burger King BBQ Bacon Crispy Chicken Sandwich 2.5 
+- Burger King BBQ Bacon King 3 
+- Burger King Chicken Cordon Bleu Sandwich 7 
+- Burger King Farmhouse King Protein 2
+
+Protein amount: 
+- Burger King Farmhouse King Protein 63
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+
+### TYPE YOUR CODE BELOW ###
+
+fastfood_clean <- fastfood_df |>
+  mutate(fiber = if_else(item == "Mushroom & Swiss King" & is.na(fiber), 0, fiber)) |> 
+  mutate(fiber = if_else(item == "Chicken Parmesan Sandwich" & is.na(fiber), 0, fiber)) |> 
+  mutate(fiber = if_else(item == "Spicy chicken Nuggets" & is.na(fiber), 2, fiber)) |> 
+  mutate(fiber = if_else(item == "BBQ Bacon Crispy Chicken Sandwich" & is.na(fiber), 2.5, fiber)) |> 
+  mutate(fiber = if_else(item == "BBQ Bacon King" & is.na(fiber), 3, fiber)) |> 
+  mutate(fiber = if_else(item == "Chicken Cordon Bleu Sandwich" & is.na(fiber), 7, fiber)) |>
+  mutate(fiber = if_else(item == "Farmhouse King" & is.na(fiber), 2, fiber)) |>
+  mutate(protein = if_else(item == "Farmhouse King" & is.na(protein), 63, protein)) |>
+  as.data.frame()
+
+# After resolving the NAs above, there are still six items with NA for fiber, which will be removed later.
+fastfood_clean |> summary()
+
+# View remaining rows with NAs
+fastfood_clean |> filter(is.na(fiber) | is.na(protein))
+
+```
+
+### Q3B After running `fastfood_clean`, update your `fastfood_clean` dataframe by removing the `item` column and all remaining rows containing any NAs. Then, calculate the mean, median, and standard deviation of calories and store the results in Q3.
+
+- Be sure to match the header names shown below.
+
+Your output should look something like this:
+
+```         
+MeanCal   MedCal    SdCal
+<dbl>     <dbl>     <dbl>
+<value>   <value>   <value>   
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q3 # 
+### TYPE YOUR CODE BELOW ###
+
+fastfood_clean <- fastfood_clean|>
+                  drop_na()|>
+                  mutate(item=NULL)
+                 # mutate(across(c(A, B), list(mean = mean, sd = sd), .names = "{.col}_{.fn}"))
+fastfood_clean
+
+Q3 <- fastfood_clean|>
+   summarise(
+    MeanCal = round(mean(calories, na.rm = TRUE),2),
+    MedCal = median(calories, na.rm = TRUE),
+    SdCal = round(sd(calories, na.rm = TRUE),2)
+  )|>
+  as.data.frame()
+
+
+### VIEW OUTPUT
+Q3
+
+```
+
+### Q4 Make a multiple regression model predicting calories from ALL other columns. Use the model to predict the number of calories in the relatively new Smoky BLT Quarter Pounder® with Cheese & Smoky BLT Double Quarter Pounder® with Cheese which is a McDonald's sandwich with the following nutrition facts: total_fat = 51, cholesterol = 115, sodium = 1410, total_carb = 41, fiber = 3, sugar = 9, protein = 36. Store the prediction in Q4.
+
+- Note: The actual number of calories of this sandwich is 770. How close is your prediction?
+- It would be advantageous to create a new dataframe with these specifications for this new sandwich, including all of the restaurant columns.
+
+Your output should look something like this:
+```       1 
+          <value>
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q4 # 
+### TYPE YOUR CODE BELOW ###
+
+
+fastfood_cleanmodel1 <- lm( calories ~ . - calories ,data = fastfood_clean)
+
+new.data <- data.frame(Sonic=0,Subway=0,McDonalds=1,TacoBell=0,BurgerKing=0, Arbys=0 ,total_fat = 51, cholesterol = 115, sodium = 1410, total_carb = 41, fiber = 3, sugar = 9, protein = 36)
+
+Q4<-round(predict(fastfood_cleanmodel1, 
+        newdata = new.data),2)
+        #as.data.frame()
+
+### VIEW OUTPUT ###
+Q4
+
+
+```
+
+### Q5 Based on the regression from Q4, notice that the restaurants are not significant to our model. Create a new dataframe named `fastfood_clean_numeric` with only the numeric variables, not the binary restaurant variables. Then, create a correlation matrix for the correlations between all the remaining numeric variables.
+
+-   Assign the matrix to Q5. It should look something like this:
+
+Your output should look something like this:
+
+```         
+              calories    total_fat   cholesterol sodium total_carb     fiber     sugar   protein
+calories        [value]   [value]     [value]     [value]      [value]   [value] [value] [value]
+total_fat       [value]   [value]     [value]     [value]      [value]   [value] [value] [value]
+cholesterol     [value]   [value]     [value]     [value]      [value]   [value] [value] [value]
+sodium          [value]   [value]     [value]     [value]      [value]   [value] [value] [value]
+total_carb      [value]   [value]     [value]     [value]      [value]   [value] [value] [value]
+fiber           [value]   [value]     [value]     [value]      [value]   [value] [value] [value]
+sugar           [value]   [value]     [value]     [value]      [value]   [value] [value] [value]
+protein         [value]   [value]     [value]     [value]      [value]   [value] [value] [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q5 # 
+
+### TYPE YOUR CODE BELOW ###
+
+#summary(fastfood_cleanmodel1)
+
+fastfood_clean_numeric <-fastfood_clean|>
+          select(calories, total_fat,cholesterol,sodium,total_carb, fiber, sugar, protein)|>
+          as.data.frame()
+Q5 <- round(cor(fastfood_clean_numeric[,c("calories", "total_fat","cholesterol","sodium","total_carb", "fiber", "sugar", "protein")]),2)
+
+### VIEW OUTPUT ###
+Q5
+
+```
+
+### Q6 Make a multiple regression model predicting calories from all other numeric variables in `fastfood_clean_numeric`. Remove the variable from the regression model that has the highest variance inflation factor. Create a new regression model without this variable, and store the new VIF results (after removing the variable from the initial model), rounded to one decimal place, and store the results in Q6.
+
+- Note: We will not remove the variable from the entire dataframe, just from the regression model.
+
+Your output should look something like this:
+
+```         
+ total_fat     sodium     total_carb      fiber      sugar        protein 
+  <value>       <value>   <value>       <value>      <value>      <value> 
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q6 # 
+
+### TYPE YOUR CODE BELOW ###
+
+fastfood_clean_numeric_model1 <- lm( calories ~ . - calories ,data = fastfood_clean_numeric)
+
+#summary(fastfood_clean_numeric_model1)
+vif(fastfood_clean_numeric_model1)
+
+fastfood_clean_numeric_model2 <- lm( calories ~ . - calories  - cholesterol,data = fastfood_clean_numeric)
+Q6 <- round(vif(fastfood_clean_numeric_model2),1)
+
+# VIEW OUTPUT
+Q6
+```
+
+### Q7 Using any observation where Cook's D is greater than 0.01, remove all influential points from the second multiple regression model you created in Q6. Create a dataframe called `fastfood_inf_pts` with rows that were identifed as influential points, arranged by the highest calorie items first. Separately, create a new dataframe `fastfood_final` without the influential observations. Finally, store the first four columns of the `fastfood_inf_pts` dataframe in Q7.
+
+Your output should look something like this:
+
+```         
+calories    total_fat   cholesterol   sodium
+<dbl>       <dbl>       <dbl>         <dbl>
+<value>     <value>     <value>       <value>   
+<value>     <value>     <value>       <value>   
+<value>     <value>     <value>       <value>       
+<value>     <value>     <value>       <value>   
+<value>     <value>     <value>       <value>   
+<value>     <value>     <value>       <value>   
+<value>     <value>     <value>       <value>   
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q7 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+# Calculate Cook's distance
+cooks_d <- cooks.distance(fastfood_clean_numeric_model2)
+
+# Identify outliers
+infpts <- unique(which((cooks_d > 0.01))) # use unique to fix duplicate issue
+
+fastfood_inf_pts <- fastfood_clean_numeric[c(infpts), ]|>
+                  #select(carrier,cancellations) |>
+                  arrange(desc(calories))|>
+                  as.data.frame()
+  
+fastfood_final <- fastfood_clean_numeric[-c(infpts), ]
+
+#fastfood_final
+
+Q7 <- fastfood_inf_pts|>
+      select(1:4)|>
+      as.data.frame()
+
+
+
+
+### VIEW OUTPUT ###
+Q7
+
+```
+
+### Q8 Using the dataframe you created in Q7 (`fastfood_final`), create a new multiple regression model, predicting calories based on all other variables, except the variable with high variance inflation factor that you identified in Q6. Store the variance inflation factors for all variables in Q8, rounded to one decimal place.
+
+Your output should look something like this:
+
+```         
+ total_fat     sodium     total_carb      fiber      sugar        protein 
+  <value>       <value>   <value>       <value>      <value>      <value> 
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q8 # 
+
+### TYPE YOUR CODE BELOW ###
+
+fastfood_finalmodel1 <- lm( calories ~ . - calories - cholesterol,data = fastfood_final)
+Q8 <- round(vif(fastfood_finalmodel1),1)
+### VIEW OUTPUT ###
+Q8
+```
+
+### Q9 From the model you created in Q8, create a 95% confidence interval for the mean number of calories for a sandwich with the same nutrition facts as the McDonald's sandwich we used earlier in Q4.
+
+Your output should look something like this:
+
+```         
+       fit      lwr        upr
+1     <value>   <value>    <value>
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q9 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+new.data <- data.frame(Sonic=0,Subway=0,McDonalds=1,TacoBell=0,BurgerKing=0, Arbys=0 ,total_fat = 51, cholesterol = 115, sodium = 1410, total_carb = 41, fiber = 3, sugar = 9, protein = 36)
+
+
+Q9 <-round(predict(fastfood_finalmodel1, 
+        newdata = new.data, 
+        interval = 'confidence',  
+        level = 0.95),2)
+
+
+
+### VIEW OUTPUT
+Q9
+
+
+```
+
+### Q10 Create a multiple regression model that predicts calories from total fat, total carbohydrates, protein and the interaction between total fat and total carbohydrates using the `fastfood_final` dataframe. Standardize the model and analyze the summary. Compare the standardized coefficients in the summary to understand which predictors have the greatest influence on calories, even though some may have similar (unstandarized) estimates. Store the standardized model summary in Q10.
+
+The coefficients of your output should look something like this:
+
+```
+Coefficients:
+                      Estimate Standardized Std. Error t value Pr(>|t|)    
+(Intercept)           [value]        NA     [value]    [value]  [value]    
+total_fat             [value]    [value]    [value]    [value]  [value] ***
+total_carb            [value]    [value]    [value]    [value]  [value] ***
+protein               [value]    [value]    [value]    [value]  [value] ***
+total_fat:total_carb  [value]    [value]    [value]    [value]  [value] .
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q10 # 
+
+### TYPE YOUR CODE BELOW ###
+
+fastfood_finalmodel2 <- lm( calories ~ total_fat + total_carb + protein + total_fat * total_carb,data = fastfood_final)
+
+Q10 <- summary(lm.beta(fastfood_finalmodel2))
+
+### VIEW OUTPUT ###
+Q10
+```
+
+------------------------------------------------------------------------
+
+## Before submitting to Code Grade:
+
+1)  Clear objects from your environment. Click the broom in the Environment pane in the top right. This will erase any variables (like Q1, Q2) that you've stored.
+
+2)  Rerun all your code. You can click the "Run" option above in this script pane (top right of notebook), then select "Run all". You should have all the variables stored again in the environment pane, and you should see no red error messages in the console below.
+
+------------------------------------------------------------------------
+
+This material is for enrolled students' academic use only and protected under U.S. Copyright Laws. This content must not be shared outside the confines of this course, in line with Eastern University's academic integrity policies. Unauthorized reproduction, distribution, or transmission of this material, including but not limited to posting on third-party platforms like GitHub, is strictly prohibited and may lead to disciplinary action. You may not alter or remove any copyright or other notice from copies of any content taken from BrightSpace or Eastern University's website.
+
+© Copyright Notice 2024, Eastern University - All Rights Reserved

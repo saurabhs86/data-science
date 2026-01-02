@@ -1,0 +1,609 @@
+---
+title: 'DTSC 650: Data Analytics In R'
+subtitle: 'CodeGrade Assignments Part 2: Formula1Stats'
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+---
+
+## Student Info
+
+```         
+Name: 
+Term: 
+Date:
+```
+
+------------------------------------------------------------------------
+
+## General Instructions
+
+------------------------------------------------------------------------
+
+### Name of File
+
+Name your assignment file **`Formula1Stats.qmd`**. This is a quarto "markdown" file, which has the file extension '.qmd'.
+
+------------------------------------------------------------------------
+
+### Allowable packages
+
+The only allowable package is `tidyverse`. You should not use any other packages as CodeGrade is not set up to accept them on this assignment.
+
+-   If the allowable packages are not installed on your local computer, you'll need to do a one-time installation *from the Console Window in RStudio* for each package like this:\
+    **`install.packages('<package name>')`**\
+    *Do not attempt to install packages in code that you submit to CodeGrade.*
+
+-   Note: installing the entire tidyverse with `install.packages('tidyverse')` from the Console Window will save you from having to install any of the tidyverse's individual packages in the future.
+
+-   In your code, load the package's library like this: **`library(<library name>)`**
+
+------------------------------------------------------------------------
+
+### Data Set
+
+The dataset for this assignment consists of information from Formula 1 races, drivers, constructors, qualifying, circuits, lap times, pit stops, and championships from 1950 to 2023. The source of the data is the Ergast Developer API (an experimental web service which provides a historical record of motor racing data for non-commercial purposes). The Ergast data is presented using a database philosophy (multiple related tables with foreign keys). We will use modified versions of a subset of the tables (as csv files available for download on Brightspace) and create a customized dataframe for our investigative purposes.
+
+-   You will need to download `Formula1StatsData.zip` from Brightspace and unzip the csv files into the same folder/directory as your QMD template.
+
+------------------------------------------------------------------------
+
+### Pipe Notation
+
+You may use the `tidyverse` pipe **`%>%`** or the new base R pipe **`|>`**. See [here](https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/) for a comparison.
+
+You are expected to use pipe notation in all of the CodeGrade assignments. Although there are alternate ways to filter, subset, and summarize data sets, using the pipe creates more readable code and is an important skill to develop.
+
+------------------------------------------------------------------------
+
+### Rounding requirement
+
+-   Round all float/dbl values to two decimal places.
+
+------------------------------------------------------------------------
+
+### Dataframe vs. Tibble
+
+Typically, in CodeGrade assignments, we expect output to be dataframes, not tibbles, unless otherwise noted.
+
+------------------------------------------------------------------------
+
+### Inline vs. Console
+
+By default, RStudio uses Inline output (Notebook mode) on R Markdown documents. You can switch between Inline and Console output modes by clicking the gear button in the editor toolbar (to the left of the green "insert new code chunk") and choosing either "Chunk Output Inline" or "Chunk Output in Console". See [here](https://bookdown.org/yihui/rmarkdown/notebook.html#creating-a-notebook) for more information.
+
+Console output can be useful for debugging since that's how your solutions will appear to CodeGrade. You can type code directly into the Console as well and run it from there.
+
+------------------------------------------------------------------------
+
+### Preliminaries
+
+Clear environment and load libraries.
+
+```{r}
+### It's always a good idea when working in RStudio to start with a clean 
+### environment. Clear objects from the environment memory that may be 
+### leftover from previous versions of your code or other assignments by 
+### running the following line:
+rm(list = ls())
+
+### Load Libraries
+library(tidyverse) 
+
+### There may be warning messages about some of the packages. You can 
+### ignore these. Feel free to search online for the explanations for 
+### these messages.
+
+### Set Random Number Seed
+### Do not edit this line:
+set.seed(44)
+
+```
+
+#### Load the various csv files.
+
+See here for `read_csv()` documentation: <https://readr.tidyverse.org/reference/read_delim.html>
+
+```{r}
+### read constructors.csv into the constructors dataframe
+circuits <- read_csv("circuits.csv", col_types = "nccccnnnc", na="\\N")
+
+### read constructors.csv into the constructors dataframe
+constructors <- read_csv("constructors.csv", col_types = "ncccc", na="\\N")
+
+### read drivers.csv into the drivers dataframe
+drivers <- read_csv("drivers.csv", col_types = "ncccccccc", na="\\N")
+
+### read qualifying.csv into the qualifying dataframe
+qualifying <- read_csv("qualifying.csv", col_types = "nnnnnncncncn", na="\\N")
+
+### read races.csv into the races dataframe
+races <- read_csv("races.csv", col_types = "nnnncccccccccccccc", na="\\N")
+
+### read results.csv into the results dataframe
+results <- read_csv("results.csv", col_types = "nnnnnnncnnncnnncnn", na="\\N")
+
+### read status.csv into the status dataframe
+status <- read_csv("status.csv", col_types = "nc", na="\\N")
+```
+
+#### Create a new column called `driverName` in drivers
+
+Create a `driverName` column in drivers by concatenating the driver's last name and first name with a comma separator. See here for `unite()` documentation: <https://tidyr.tidyverse.org/reference/unite.html>
+
+```{r}
+drivers <- drivers %>%
+  unite("driverName", surname:forename, sep = ", ")
+
+```
+
+#### Create the `raceResults` dataframe
+
+There are several columns with "Id" in the column name. These are foreign keys that link to the other tables/dataframes. To make our tasks a little easier in R, we're going to join the dataframes into a single dataframe called `raceResults`. We'll use the tidyverse dplyr function `left_join()` to match the id columns from two dataframes and pull in the columns with more meaningful data from the other dataframe. See here for documentation: <https://dplyr.tidyverse.org/reference/mutate-joins.html>
+
+```{r}
+### The standard use of left_join() is like this:
+newTable <- left_join(
+  x = results, 
+  y = drivers, 
+  by = "driverId", 
+  suffix = c("", "_driver")
+)
+
+```
+
+```{r}
+### Alternatively we can use the pipe and select/remove columns for the joined 
+### dataframe all at the same time. Because we're using the pipe, the `x`
+### argument of left_join() is understood to be the data from the pipe and we
+### use "." as a placeholder. 
+raceResults <- results %>%
+  left_join(
+    x = .,
+    y = drivers,            
+    by = "driverId", 
+    suffix = c("", "_driver")
+  ) %>%
+  select(-driverRef, -number_driver, -code, -dob, -nationality, -url)
+
+```
+
+##### Join statuses
+
+Let's do the same for `statusId`. Note we're piping data from our new dataframe `raceResults` and updating it so that we can keep the previous results:
+
+```{r}
+raceResults <- raceResults %>%
+  left_join(
+    x = .,
+    y = status, 
+    by = "statusId"
+  ) %>%
+  select(-statusId)
+```
+
+##### Join constructors
+
+Now we'll do `constructorID` but we'll use a cool trick: we can `select()` the columns from `constructors` in the pipe instead of removing them at the end. Also notice we're renaming the `name` column to `constructor`:
+
+```{r}
+raceResults <- raceResults %>%
+  left_join(
+    x = .,
+    y = select(
+      .data = constructors,
+      constructorId,
+      constructor = name
+    ),
+    by = "constructorId"
+  ) %>%
+  select(-constructorId)
+```
+
+##### Join races
+
+Next we'll join the `races` dataframe. Let's grab all of the columns from races except the two URL columns:
+
+```{r}
+raceResults <- raceResults %>%
+  left_join(
+    x = .,
+    y = select(
+      .data = races,
+      raceId,
+      year,
+      round,
+      circuitId,
+      raceName = name,
+      date
+    ),
+    by = "raceId"
+  )
+```
+
+##### Join circuits (race tracks)
+
+Now let's pull in information about the circuit using only name, location, and country. Also notice we're renaming the `name` column to `circuitName`:
+
+```{r}
+raceResults <- raceResults %>%
+  left_join(
+    x = .,
+    y = select(
+      .data = circuits,
+      circuitId,
+      circuitName = name,
+      location,
+      country
+    ),
+    by = "circuitId"
+  ) %>%
+  select(-circuitId)
+```
+
+##### Join qualifying
+
+Here we'll join the qualifying dataframe. Note we're using two Id fields to ensure this works properly.
+
+```{r}
+raceResults <- raceResults %>% 
+  left_join(
+    x=.,
+    y= select(
+      .data = qualifying,
+      qualifyId,
+      driverId,
+      raceId,
+      q1, q2, q3,
+      q1Millisecs, q2Millisecs, q3Millisecs
+    ),
+    by=c("driverId", "raceId")
+)
+```
+
+##### Select and rearrange the columns in `raceResults`
+
+Finally, lets cleanup `raceResults` by selecting only the columns we want and putting them in a better order:
+
+```{r}
+raceResults <- raceResults %>%
+  select(driverName, number, constructor, grid, position, positionText, 
+         positionOrder, points, laps, time, milliseconds, fastestLap, 
+         fastestLapTime, fastestLapSpeed, status, raceName, year, round, date,
+         circuitName, location, country, q1, q2, q3, q1Millisecs, q2Millisecs, 
+         q3Millisecs)
+```
+
+## ***From this point forward we'll work exclusively with the `raceResults` dataframe.***
+
+## Questions
+
+------------------------------------------------------------------------
+
+### Q1 What is the correlation between starting position and finishing position for the 2019 season?
+
+-   Calculate the Spearman correlation using `cor.test()` between starting position and finishing position for the 2019 season.
+-   Recall that the `grid` variable is a driver's starting position and the `position` variable is the finishing position for drivers that actually finished the race.
+-   Only include drivers who actually started. (Check the `grid` variable to filter for this.)
+-   Only include drivers who actually finished. (There are several possible ways to filter for this. To keep things simple, only use the `position` variable.)
+-   Do not round.
+-   Side Note: think about why we would use Spearman instead of the default Pearson.
+-   Assign the results of `cor.test()` to Q1. The answer should look something like this:
+
+```         
+    Spearman's rank correlation rho
+
+data:  [variable1] and [variable2]
+S = [value], p-value < 2.2e-16
+alternative hypothesis: true rho is not equal to 0
+sample estimates:
+      rho 
+[value] 
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q1 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+Q1 <-raceResults|>
+   filter(grid!=0 & !is.na(position))|>
+   filter(year==2019)
+
+Q1 <-  cor.test(Q1$grid,Q1$position,method = "spearman")
+
+
+### VIEW OUTPUT ###
+Q1
+
+
+```
+
+```{r}
+### Q1 For Fun ###
+### Uncomment the following code and fill in the missing values 
+### to see a plot of the correlation
+
+# ggplot(<DATASET>, aes(x = <VARIABLE1>, y = <VARIABLE2>)) +
+#   geom_point() +
+#   stat_smooth(method = "lm") +
+#   ggtitle("2019 F1 Season - Grid vs Finish Position") +
+#   xlab("Grid Position") +
+#   ylab("Finish Position")
+```
+
+### Q2 What are the correlations between starting position and finishing position for all seasons from 1950 to 2023?
+
+-   List the Spearman correlation between starting grid position and finishing position for all seasons from 1950 to 2023.
+-   Sort from *strongest* correlation to *weakest* and only display the first 10.
+-   Only include drivers who actually started and finished. (See Q1.)
+-   Round to 6 decimal places.
+-   The output should be a dataframe assigned to Q2 and look something like this:
+
+```         
+   year      cor
+1  1966 0.824858
+...
+10 1996 0.778179
+```
+
+```{r}
+### TYPE YOUR CODE BELOW ###
+
+Q2 <-raceResults|>
+  filter(grid!=0 & !is.na(position))|>
+  filter(year < 2024)|>
+  group_by(year)|>
+  summarise(cor=round(cor(grid,position,method = "spearman", use="complete.obs"),6))|>  
+  select(year, cor)|> 
+  arrange(desc(cor))|>
+  head(10)|>
+  as.data.frame()
+  
+### VIEW OUTPUT ###
+Q2
+
+```
+
+### Q3 Can we accurately model finishing position using starting position for the 2013 season?
+
+-   Run a regression predicting the finishing position from the starting position for all races in 2013.
+-   Only include drivers who actually started and finished. (See Q1.)
+-   Assign the summary of the model to Q3.
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q3 # 
+
+### TYPE YOUR CODE BELOW ###
+raceResults2023 <-raceResults|>
+  filter(year==2013)|>
+  filter(grid!=0 & !is.na(position))|>
+  as.data.frame()
+  
+  
+raceResultmodel1=lm(position ~  grid, data = raceResults2023)
+Q3<- summary(raceResultmodel1)
+
+### VIEW OUTPUT ###
+Q3
+
+```
+
+### Q4 Would using starting position *and* best qualifying time in milliseconds more accurately model finishing position for the 2013 season?
+
+-   Create a regression predicting the finishing position from the starting position for all races in 2013 (like in Q3) but this time add the driver's **best** qualifying time in milliseconds as a second predictor.
+-   Compared to the model in Q3, which one has the better AIC?
+-   Note: A driver's starting grid position is determined by three qualifying sessions. In q1 drivers post their best time on a single lap with only the 15 best times moving on to q2. Only the 10 best times move on to q3. So some drivers may only have a q1 qualifying time whereas others may have 3 qualifying times.
+-   Only include drivers who actually started and finished. (See Q1.)
+-   You'll probably want to make a new column with the driver's fastest qualifying time so that you can use it in the regression. Hint: see [here](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/Extremes) for something that might be useful.
+-   Assign the better AIC value to Q4.
+-   Round to 3 decimal places.
+-   Your output should look something like this:
+
+```         
+[1] xxxx.xxx
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q4 # 
+
+### TYPE YOUR CODE BELOW ###
+
+raceResults2023 <-raceResults|>
+  filter(year==2013)|>
+  filter(grid!=0 & !is.na(position))|>
+  #mutate(qualify=if_else(q1Millisecs>q2Millisecs,q1Millisecs,q2Millisecs))
+  mutate(qualify=pmin(q1Millisecs,q2Millisecs,q3Millisecs,na.rm=TRUE))|>
+  select(grid, position,q1Millisecs,q2Millisecs,q3Millisecs,qualify)|>
+  as.data.frame()
+  
+ #raceResults2023
+ 
+raceResultmodel2=lm(position ~  grid + qualify, data = raceResults2023)
+summary(raceResultmodel2)
+
+Q4<-AIC(raceResultmodel1)
+#Q4a<-AIC(raceResultmodel2)
+
+### VIEW OUTPUT ###
+Q4
+
+
+```
+
+### Q5 Can we accurately predict whether or not a driver won a race based on his staring position?
+
+-   Create a logistic regression for all seasons from 1950 to 2023 predicting whether or not a driver won the race based on their starting position.
+-   Only include drivers who actually started and finished. (See Q1.)
+-   Hint: You'll want to create a variable to represent whether or not the driver won.
+-   Do not round.
+-   Assign the summary of the model to Q5. Your output should look something like this:
+
+```         
+...
+Coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  [value]    [value] [value]  [value]
+grid         [value]    [value] [value]  [value] ***
+...
+Null deviance:     [value] on [value]  degrees of freedom
+Residual deviance: [value] on [value]  degrees of freedom
+AIC: [value]
+
+Number of Fisher Scoring iterations: [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q5 # 
+
+### TYPE YOUR CODE BELOW ###
+
+raceResults5 <-raceResults|>
+  filter(grid!=0  & !is.na(position))|>
+  filter(year < 2024)|>
+  mutate(position1=if_else(position==1,1,0))|>
+  select(grid,position1)|>
+  as.data.frame()
+
+#raceResults5
+
+raceResultmodel5=glm(position1 ~ grid, binomial(), raceResults5)
+Q5 <-summary(raceResultmodel5)
+
+
+
+### VIEW OUTPUT ###
+Q5
+
+
+```
+
+### Q6a What are the log odds of winning from each of the first 10 grid positions?
+
+-   Create a 10 x 2 dataframe with the values shown in the table below representing the first 10 grid positions. Then use the model from Q5 and this new dataframe to predict the log odds of winning from each of the first 10 grid positions.
+
+```         
+position  grid
+  p1       1  
+  p2       2  
+  p3       3  
+  p4       4  
+  p5       5  
+  p6       6  
+  p7       7  
+  p8       8  
+  p9       9  
+ p10      10  
+```
+
+-   Use the [`predict()`](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/predict.glm) function.\
+    *Note: the predict() function is a wrapper for predict.glm() (since we're using a glm model).*
+-   The `predict()` function call will need 3 arguments: `object`, `newdata`, and `type`.
+-   The default `type` argument for `predict()` is “link” (for a glm model) which gives log-odds. Using `type=“response”` gives probabilities.
+-   Round predictions to 4 decimal places.
+-   Assign the results of the `predict()` function call to Q6a. Your output should look something like this:
+
+```         
+    1     2     3     4     5     6    7      8     9    10 
+[val] [val] [val] [val] [val] [val] [val] [val] [val] [val] 
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q6a # 
+
+### TYPE YOUR CODE BELOW ###
+
+new.data <- data.frame(position=c("p1","p2","p3","p4","p5","p6","p7","p8","p9","p10"),grid=c(1,2,3,4,5,6,7,8,9,10))
+new.data
+
+Q6a <-round(predict(raceResultmodel5,newdata = new.data ),4)
+### VIEW OUTPUT ###
+Q6a
+
+```
+
+*Think back to the summary of the model from Q5 and notice the relationship between the `intercept` and the `grid` coefficient in the output of the `predict()` function.*
+
+### Q6 What are the probabilities of winning from each of the first 10 grid positions?
+
+-   Once again use the model from Q5 with the new dataframe from Q6a but this time predict the *probability* of winning from each of the first 10 grid positions.
+-   Use the [`predict()`](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/predict.glm) function.\
+    *Note: the predict() function is a wrapper for predict.glm() (since we're using a glm model).*
+-   The `predict()` function call will need 3 arguments: `object`, `newdata`, and `type`.
+-   The default `type` argument for `predict()` is “link” (for a glm model) which gives log-odds. Using `type=“response”` gives probabilities.
+-   Round predictions to 4 decimal places.
+-   Assign the results of the `predict.glm()` function call to Q6. Your output should look something like this:
+
+```         
+    1     2     3     4     5     6    7      8     9    10 
+[val] [val] [val] [val] [val] [val] [val] [val] [val] [val] 
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q6 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+Q6 <-round(predict(raceResultmodel5,newdata = new.data ,type="response" ),4)
+
+
+### VIEW OUTPUT ###
+Q6
+
+```
+
+```{r}
+### Q6a For Fun ###
+### A plot of the preditions for Q6a
+### If you've done Q6a correctly, this plot should be a straight line.
+Q6aData <- as.data.frame(Q6a) |> 
+  rename("logOdds" = Q6a) |> 
+  mutate(position = row_number(), .before = 1)
+
+ggplot(Q6aData, aes(x = position, y = logOdds)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(n.breaks=10) +
+  ggtitle("Log Odds Of Winning From First 10 Grid Positions") +
+  xlab("Grid Position") +
+  ylab("Log Odds Of Win")
+```
+
+```{r}
+### Q6 For Fun ###
+### A plot of the predictions for Q6
+### If you've done Q6 correctly, this plot should be a logarithmic curve.
+Q6data <- as.data.frame(Q6) |> 
+  rename("probability" = Q6) |> 
+  mutate(position = row_number(), .before = 1)
+
+ggplot(Q6data, aes(x = position, y = probability)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(n.breaks=10) +
+  ggtitle("Probability Of Winning From First 10 Grid Positions") +
+  xlab("Grid Position") +
+  ylab("Probability Of Win")
+```
+
+------------------------------------------------------------------------
+
+# Before submitting to Code Grade:
+
+1)  Clear objects from your environment. Click the broom in the Environment pane in the top right. This will erase any variables (like Q1, Q2) that you've stored.
+
+2)  Rerun all your code. You can click the "Run" option above in this script pane (top right of notebook), then select "Run all". You should have all the variables stored again in the environment pane, and you should see no red error messages in the console below.
+
+------------------------------------------------------------------------
+
+This material is for enrolled students' academic use only and protected under U.S. Copyright Laws. This content must not be shared outside the confines of this course, in line with Eastern University's academic integrity policies. Unauthorized reproduction, distribution, or transmission of this material, including but not limited to posting on third-party platforms like GitHub, is strictly prohibited and may lead to disciplinary action. You may not alter or remove any copyright or other notice from copies of any content taken from BrightSpace or Eastern University's website.
+
+© Copyright Notice 2024, Eastern University - All Rights Reserved

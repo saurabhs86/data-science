@@ -1,0 +1,484 @@
+---
+title: 'DTSC 650: Data Analytics In R'
+subtitle: 'CodeGrade Assignments Part 1: nycflights13'
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+---
+
+## Student Info
+
+```         
+Name: 
+Term: 
+Date:
+```
+
+------------------------------------------------------------------------
+
+## General Instructions
+
+------------------------------------------------------------------------
+
+### Name of File
+
+Name your assignment file **`nycflights13.qmd`**. This file is a quarto "notebook," which has the file has the extension '.qmd'.
+
+------------------------------------------------------------------------
+
+### Allowable packages
+
+The only allowable packages are `nycflights13` and the `tidyverse`. You should not use any other packages, as CodeGrade is not set up to accept them on this assignment.
+
+-   If the allowable packages are not installed on your local computer, you'll need to do a one-time installation *from the Console Window in RStudio* for each package like this:\
+    **`install.packages('<package name>')`**\
+    *Do not attempt to install packages in code that you submit to CodeGrade.*
+
+-   Note: installing the entire tidyverse with `install.packages('tidyverse')` from the Console Window will save you from having to install any of the tidyverse's individual packages in the future.
+
+-   In your code, load the package's library like this: **`library(<library name>)`**
+
+------------------------------------------------------------------------
+
+### Data Set
+
+The data set for this assignment is called **`flights`**. See the [nycflights13 documentation](https://nycflights13.tidyverse.org/reference/flights.html) for more info.
+
+------------------------------------------------------------------------
+
+### Pipe Notation
+
+You may use the `tidyverse` pipe **`%>%`** or the new base R pipe **`|>`**. See [here](https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/) for a comparison.
+
+You are expected to use pipe notation in all of the CodeGrade assignments. Although there are alternate ways to filter, subset, and summarize data sets, using the pipe creates more readable code and is an important skill to develop.
+
+------------------------------------------------------------------------
+
+### Rounding requirement
+
+-   Round all float/dbl values to two decimal places, unless indicated otherwise.
+
+------------------------------------------------------------------------
+
+### Dataframe vs. Tibble
+
+Typically, in order to match your output to that expected in Code Grade, you must convert tibbles to dataframes (unless otherwise noted). The very last line of your code solution will be this conversion. For example, `head()` will occur *prior* to the conversion to a dataframe.
+
+------------------------------------------------------------------------
+
+### Inline vs. Console
+
+By default, RStudio uses Inline output (Notebook mode) on R Markdown documents. You can switch between Inline and Console output modes by clicking the gear button in the editor toolbar (to the left of the green "insert new code chunk") and choosing either "Chunk Output Inline" or "Chunk Output in Console". See [here](https://bookdown.org/yihui/rmarkdown/notebook.html#creating-a-notebook) for more information.
+
+Console output can be useful for debugging since that's how your solutions will appear to CodeGrade. You can type code directly into the Console as well and run it from there. For example: after you run the Q0 example code inline (shown below), you can type `Q0<ENTER>` in the Console to see how the output appears to CodeGrade.
+
+------------------------------------------------------------------------
+
+### Preliminaries
+
+```{r}
+### It's always a good idea when working in RStudio to start with a clean environment. 
+### Clear objects from the environment memory that may be leftover from previous versions of your code or other assignments by running the following line:
+rm(list = ls())
+
+### Load Libraries
+library(tidyverse) 
+library(nycflights13) 
+
+
+### There may be warning messages about some of the packages. You can ignore these. Feel free to search online for the explanations for these messages.
+```
+
+### Before attempting the questions (Q1-Q10) below, familiarize yourself with the `flights` dataset. Run the following block.
+
+```{r}
+flights
+
+# You may get a warning based on your version of R, which says:
+## "[WARNING] Deprecated: --self-contained. use --embed-resources --standalone"
+# You can ignore this.
+```
+
+### Q0: An Example
+
+Suppose the question is:\
+**Find the average air time for all flights in this data set by origin. Output the answer with the name air_time_mean and store the answer as a data frame. Round the average to two decimal places, and store it in Q0.**
+
+The following code block provides the solution:
+
+```{r}
+Q0 <- flights %>%
+  select(air_time, origin) %>%
+  group_by(origin) %>% 
+  summarise(air_time_mean = round(mean(air_time, na.rm=TRUE),2)) %>%
+  as.data.frame()
+Q0
+
+### Be careful using the spelling "summarize" with a 'z'.
+### There is the Hmisc::summarize and the dplyr::summarize.
+```
+
+For the above code block, run the entire cell with the green arrow on the right.
+
+We recommend highlighting each section of this solution and investigating the output to understand what the pipe and code are doing. In other words, use your cursor to highlight *`flights %>% select(air_time, origin)`* in the block above, press CTRL + ENTER (on a PC) or Cmd + Return (on a Mac), and see what the output is. Then, highlight *``` flights %>% select(air_time, origin) %>% group_by(origin) %>% summarize(air_time_mean = round(mean(air_time, na.rm=TRUE),2))``) ```*, press CTRL + ENTER and see what the output is. This will help you understand the pipe and debug your code.
+
+We expect your solutions to look like the above code block, where you are using the pipe operator (not other approaches) and, in some cases, finding the solution in just one line of code.
+
+------------------------------------------------------------------------
+
+## Questions
+
+------------------------------------------------------------------------
+
+### Q1 Create a dataframe that has only flights from JFK airport. Once you've converted the output to a dataframe, display only the first 3 rows.
+
+-   Your solution should be a dataframe assigned to Q1.
+-   The resulting dataframe should be 3 rows with 19 columns and look something like this:
+
+```         
+     year   month <more cols>    hour  minute time_hour
+1 [value] [value] ........... [value] [value]   [value]
+2 [value] [value] ........... [value] [value]   [value]
+3 [value] [value] ........... [value] [value]   [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q1 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q1 <- flights |> 
+  filter(origin=='JFK')|>
+  head(3)|>
+  as.data.frame()
+
+
+
+### VIEW OUTPUT ###
+Q1
+
+```
+
+### Q2 Create a dataframe that has only flights from LaGuardia airport with only the columns month, day, origin, and destination, and departure time (in that order). View only the first 8 rows.
+
+-   The resulting dataframe should be 8 rows by 5 columns.
+-   Before viewing the first 8 rows, the dataframe has 104,662 rows.
+-   Your solution should be a dataframe assigned to Q2 and look something like this:
+
+```         
+    month     day  origin    dest dep_time
+1 [value] [value] [value] [value]  [value]
+...
+8 [value] [value] [value] [value]  [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q2 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q2 <- flights |> 
+  filter(origin=='LGA')|>
+  select(month,day,origin,dest,dep_time)|>
+  head(8)|>
+  as.data.frame()
+
+
+
+
+### VIEW OUTPUT ###
+Q2
+
+```
+
+### Q3 Find the median arrival time (name it median_arr_time), grouped by the airport from which the flight originated.
+
+-   The resulting dataframe should have 3 rows and 2 columns.
+-   Your solution should be a dataframe assigned to Q3 and look something like this:
+
+```         
+   origin median_arr_time
+1 [value]         [value]
+2 [value]         [value]
+3 [value]         [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q3 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+Q3 <- flights |> 
+  select(arr_time,origin)|>
+  group_by(origin)|>
+  summarise(median_arr_time=median(arr_time,na.rm = TRUE))|>
+  as.data.frame()
+
+
+
+
+### VIEW OUTPUT ###
+Q3
+
+```
+
+### Q4 Find all the flights arriving in Myrtle Beach that arrived on the first day of any month. Show the airport from which the flight departed, the flight number, the tail number, and the scheduled arrival time (in that order). Sort by lowest to highest scheduled arrival time.
+
+-   The resulting dataframe should have 2 rows and 4 columns.
+-   Your solution should be a dataframe assigned to Q4 and look something like this:
+
+```         
+   origin  flight tailnum sched_arr_time
+1 [value] [value] [value]        [value]
+1 [value] [value] [value]        [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q4 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q4 <- flights |> 
+  filter(day == 1 & dest=='MYR')|>
+  select(origin, flight, tailnum, sched_arr_time )|>
+  arrange(sched_arr_time,FALSE)|>
+  as.data.frame()
+
+
+### VIEW OUTPUT ###
+Q4
+
+```
+
+### Q5 Create a new column that converts the distance into feet (from miles). Show only the months of November and December. Display the month, day, origin, dest, distance, and distance_feet columns in a dataframe. Show only the first 4 rows.
+
+-   The dataframe should have 55,403 rows before you look at just the first 4 rows' output.
+-   Your solution should be a dataframe assigned to Q5 and look something like this:
+
+```         
+  month       day  origin    dest distance distance_feet
+1 <value> <value> <value> <value> <value>        <value>
+2 <value> <value> <value> <value> <value>        <value>
+3 <value> <value> <value> <value> <value>        <value>
+4 <value> <value> <value> <value> <value>        <value>
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q5 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+Q5 <- flights |> 
+  filter(month == 11 | month==12)|>
+  mutate(distance_feet=distance*5280)|>
+  select(month, day, origin, dest, distance,distance_feet )|>
+  head(4)|>
+  as.data.frame()
+
+### VIEW OUTPUT ###
+Q5
+
+```
+
+### Q6 What is the maximum distance of flights for each of the carriers 9E, B6, and EV for the last 4 months of 2013? Order them in descending order and save your result as a dataframe.
+
+-   Your solution should be a dataframe assigned to Q6 and should look something like this:
+
+```         
+  carrier max_dist
+1      B6 [value]
+2      9E [value]
+3      EV [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q6 # 
+
+### TYPE YOUR CODE BELOW ###
+Q6 <- flights |> 
+  filter(month == 9 | month==10  | month==11  | month==12)|>
+  filter(carrier == 'B6' | carrier=='9E'  | carrier=='EV')|>
+  select( carrier,distance) |>
+  group_by(carrier) |>
+  summarise(max_dist=max(distance))|>
+  arrange(desc(max_dist))|>
+  as.data.frame()
+
+
+
+
+### VIEW OUTPUT ###
+Q6
+
+```
+
+### Q7 Considering only Southwest Airlines and Mesa Airlines flights, find the median air time for each month and name it med_air_time, then rank the months from largest to smallest median. Show the first 5 results.
+
+-   Your solution should be a dataframe assigned to Q7.
+
+```         
+  month   med_air_time
+1 [value]      [value]
+2 [value]      [value]
+3 [value]      [value]
+4 [value]      [value]
+5 [value]      [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q7 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q7 <- flights |> 
+  filter(carrier == 'WN' | carrier=='YV')|>
+  select( month,air_time) |>
+  group_by(month) |>
+  summarise(med_air_time=median(air_time,na.rm = TRUE ))|>
+  arrange(desc(med_air_time))|>
+  head(5)|>
+  as.data.frame()
+
+### VIEW OUTPUT ###
+Q7
+
+```
+
+### Q8 Ignoring all the JetBlue flights and considering only flights in May through September, find shortest (the best) arrival delay times by origin/destination combination. Include a column that converts arrival delay minutes to arrival delay hours (call it arr_delay_hr) Rank the best 5 arrival delay times.
+
+-   What do we mean by "the best"? What we are asking for is the opposite of "the worst" arrival delay times. For example, the *worst* was a 1272 minute delay (that's 21.2 hours!) with Hawaiian airlines from JFK to Honolulu. In this question, we want "the best" arrival delay times.
+
+-   Your solution should be a dataframe assigned to Q8 and should look something like this:
+
+```         
+  carrier   month  origin    dest  arr_delay  arr_delay_hr
+1 [value] [value] [value] [value]    [value]       [value]
+2 [value] [value] [value] [value]    [value]       [value]
+3 [value] [value] [value] [value]    [value]       [value]
+4 [value] [value] [value] [value]    [value]       [value]
+5 [value] [value] [value] [value]    [value]       [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q8 # 
+
+### TYPE YOUR CODE BELOW ###
+Q8 <- flights |> 
+  filter(carrier != 'B6')|>
+  filter(month %in% c(5,6,7,8,9))|>
+  filter(!is.na(arr_delay))|>
+  select( carrier,month,origin,dest,arr_delay) |>
+  mutate(arr_delay_hr=round((arr_delay/60),digits = 2))|>
+  arrange(arr_delay_hr)|>
+  head(5)|>
+  as.data.frame()
+
+
+
+
+### VIEW OUTPUT ###
+Q8
+
+```
+
+### Q9 What five days of the year had the largest discrepancy between its mean distance and its median distance when leaving from LaGuardia? Calculate the mean and median distance for each day of the year, called mean_dist and med_dist, respectively. Then create a column of the difference between the mean and median for the given day, called diff_dist. Round the mean and the difference columns to the nearest tenth.
+
+-   Sort in descending order.
+
+-   Your solution should be a dataframe assigned to Q9 and should look something like this:
+
+```         
+  month       day mean_dist med_dist diff_dist
+1 [value] [value]   [value]  [value]   [value]
+2 [value] [value]   [value]  [value]   [value]
+3 [value] [value]   [value]  [value]   [value]
+4 [value] [value]   [value]  [value]   [value]
+5 [value] [value]   [value]  [value]   [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q9 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q9 <- flights |> 
+  filter(origin == 'LGA')|>
+  filter(!is.na(distance))|>
+   summarize(
+    mean_dist = round(mean(distance, 
+                 na.rm = TRUE),digit=1),
+    med_dist = round(median(distance, 
+                 na.rm = TRUE),digit=1),
+    .by = c(month, day)
+  )|>
+  mutate(diff_dist=mean_dist-med_dist)|>
+  arrange(desc(diff_dist))|>
+  head(5)|>
+  as.data.frame()
+
+
+### VIEW OUTPUT ###
+Q9
+
+```
+
+### Q10 Calculate the median departure time for flights out of JFK airport in July heading to Philadelphia and Pittsburgh, separately. Call it the med_dep_time.
+
+-   Your solution should be a dataframe assigned to Q10 and should look something like this:
+
+```         
+  dest   med_dep_time
+1 [value]     [value]
+2 [value]     [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q10 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q10 <- flights |> 
+  filter(origin == 'JFK')|>
+  filter(month == 7)|>
+  filter(dest %in% c('PHL','PIT'))|>
+  filter(!is.na(dep_time))|>
+  select( dest,dep_time) |>
+  group_by(dest)|>
+  summarise(med_dep_time=median(dep_time))|>
+  arrange(desc(med_dep_time))|>
+  as.data.frame()
+
+
+
+
+
+### VIEW OUTPUT ###
+Q10
+
+```
+
+------------------------------------------------------------------------
+
+# Before submitting to Code Grade:
+
+1)  Clear objects from your environment. Click the broom in the Environment pane in the top right. This will erase any variables (like Q1, Q2) that you've stored.
+
+2)  Rerun all your code. You can click the "Run" option above in this script pane (top right of notebook), then select "Run all". You should have all the variables stored again in the environment pane, and you should see no red error messages in the console below.
+
+------------------------------------------------------------------------
+
+This material is for enrolled students' academic use only and protected under U.S. Copyright Laws. This content must not be shared outside the confines of this course, in line with Eastern University's academic integrity policies. Unauthorized reproduction, distribution, or transmission of this material, including but not limited to posting on third-party platforms like GitHub, is strictly prohibited and may lead to disciplinary action. You may not alter or remove any copyright or other notice from copies of any content taken from BrightSpace or Eastern University's website.
+
+© Copyright Notice 2024, Eastern University - All Rights Reserved

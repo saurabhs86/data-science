@@ -1,0 +1,633 @@
+---
+title: 'DTSC 650: Data Analytics In R'
+subtitle: 'CodeGrade Assignments Part 2: loansStats'
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+---
+
+## Student Info
+
+```         
+Name: 
+Term: 
+Date:
+```
+
+------------------------------------------------------------------------
+
+## General Instructions
+
+------------------------------------------------------------------------
+
+### Name of File
+
+Name your assignment file **`loansStats`**. This is a quarto "markdown" file, which has the file has the extension '.qmd'.
+
+------------------------------------------------------------------------
+
+### Allowable packages
+
+The allowable packages are `tidyverse`, `lubridate`, `car`, `lm.beta`, `olsrr`, `nnet`. You should not use any other packages as CodeGrade is not set up to accept them on this assignment.
+
+-   If the allowable packages are not installed on your local computer, you'll need to do a one-time installation *from the Console Window in RStudio* for each package like this:\
+    **`install.packages('<package name>')`**\
+    *Do not attempt to install packages in code that you submit to CodeGrade.*
+
+-   Note: installing the entire tidyverse with `install.packages('tidyverse')` from the Console Window will save you from having to install any of the tidyverse's individual packages in the future.
+
+-   In your code, load the package's library like this: **`library(<library name>)`**
+
+-   **Download the `loans_full.csv` file from Brightspace and place it in the same folder/directory as your script file. Then in RStudio, set your Working Directory to your Source File location: In the menus choose Session \| Set Working Directory \| To Source File Location.**
+
+-   Load the `loans_full.csv` file like this: `loans_raw <- read_csv('loans_full.csv')`.
+
+------------------------------------------------------------------------
+
+### Data Set
+
+The data set includes results from 10,000 loans, all of which were initiated sometime during the first quarter of 2018.
+
+The data set is available on Brightspace as `loans_full.`
+
+------------------------------------------------------------------------
+
+### Pipe Notation
+
+You may use the `tidyverse` pipe **`%>%`** or the new base R pipe **`|>`**. See [here](https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/) for a comparison.
+
+You are expected to use pipe notation in all of the CodeGrade assignments. Although there are alternate ways to filter, subset, and summarize data sets, using the pipe creates more readable code and is an important skill to develop.
+
+------------------------------------------------------------------------
+
+### Rounding requirement
+
+-   Round all float/dbl values to two decimal places.
+
+------------------------------------------------------------------------
+
+### Dataframe vs. Tibble
+
+Typically, in CodeGrade assignments, we expect output to be dataframes, not tibbles, unless otherwise noted.
+
+------------------------------------------------------------------------
+
+### Inline vs. Console
+
+By default, RStudio uses Inline output (Notebook mode) on R Markdown documents. You can switch between Inline and Console output modes by clicking the gear button in the editor toolbar (to the left of the green "insert new code chunk") and choosing either "Chunk Output Inline" or "Chunk Output in Console". See [here](https://bookdown.org/yihui/rmarkdown/notebook.html#creating-a-notebook) for more information.
+
+Console output can be useful for debugging since that's how your solutions will appear to CodeGrade. You can type code directly into the Console as well and run it from there. For example: after you run the Q1 example code inline (shown below), you can type `Q1<ENTER>` in the Console to see how the output appears to CodeGrade.
+
+------------------------------------------------------------------------
+
+### Requirement when using `lm()`
+
+Your regressions must use the following structure: `lm([variable] ~ [variable], data = [dataset])`.
+
+CodeGrade will mark your work incorrect if you use the structure: `lm(dataset$variable1 ~ dataset$variable2)`.
+
+------------------------------------------------------------------------
+
+### Preliminaries
+
+```{r}
+### It's always a good idea when working in RStudio to start with a clean environment. 
+### Clear objects from the environment memory that may be leftover from previous 
+###   versions of your code or other assignments by running the following line:
+rm(list = ls())
+
+### Load Library
+library(tidyverse)
+library(car)
+library(lm.beta)
+library(olsrr)
+library(nnet)
+
+### Load the data file
+loans_raw <- read_csv('loans_full.csv')
+
+### There may be red warning messages about tidyverse and the packages and contains. You can ignore these. Feel free to search online for the explanations for these messages.
+```
+
+### Before attempting the questions below, familiarize yourself with the `loans` dataset. Run the block below.
+
+Some of the variables we will work with are 
+-   `interest_rate`: the interest rate of the loan
+-   `annual_income`: the individual's annual income, in dollars
+-   `verified_income`: a categorical variable describing whether the borrower's income source and amount have been verified with levels 'verified', 'source only', 'not'
+-   `debt_to_income`: debt-to-income ratio, which is the percentage of total debt of the borrower divided by their total income
+-   `debt_to_income_joint`: debt-to-income ratio for the borrower and at least one other individual
+-   `total_credit_utilized`: total credit balance, excluding a mortgage
+-   `public_record_bankrupt`: number of bankruptcies listed in the public record for this applicant
+-   `term`: the length of the loan term, in months
+-   `issue_month`: month the loan was issued
+-   `inquiries_last_12m`: inquiries into the applicant's credit during the last 12 months
+-   `disbursement_method`: a categorical variable for the disbursement method of the loan ('cash' or 'directpay')
+-   `grade`: a categorical variable for the grade associated with the loan
+-   `loan_purpose`: the category for the purpose of the loan
+
+
+```{r}
+loans_raw
+
+# You may get a warning based on your version of R, which says:
+## "[WARNING] Deprecated: --self-contained. use --embed-resources --standalone"
+# You can ignore this.
+
+```
+
+------------------------------------------------------------------------
+
+## Questions
+
+------------------------------------------------------------------------
+
+### Q1A A bank has tasked you to create a regression model to predict the interest rate they should assign to personal loans, based on historic data they have on 10,000 borrowers. Before we begin, we will clean the dataset. Perform the following data cleaning steps.
+
+1.  Rename the following columns (on the left is the new name; on the right, the current name). A few of the columns have the same name (e.g., grade). Create a new dataframe called `loans` with these new names and in the order shown. Do not include any other columns in `loans` at this point.
+
+rate = interest_rate, income = annual_income, income_ver = verified_income, dti = debt_to_income, dti_joint = debt_to_income_joint, credit_util = total_credit_utilized, bankruptcies = public_record_bankrupt, loan_term = term, issued_month = issue_month, inquiries = inquiries_last_12m, disbursement_method = disbursement_method, grade = grade, loan_purpose = loan_purpose
+
+2.  Sort the dataframe by `rate` (highest to lowest), which will be our response variable later.
+
+```{r}
+### TYPE YOUR CODE BELOW ###
+
+loans <- loans_raw|>
+      rename(rate = interest_rate, income = annual_income, income_ver = verified_income, dti = debt_to_income, dti_joint = debt_to_income_joint, credit_util = total_credit_utilized, bankruptcies = public_record_bankrupt, loan_term = term, issued_month = issue_month, inquiries = inquiries_last_12m, disbursement_method = disbursement_method, grade = grade, loan_purpose = loan_purpose)|>
+  select(rate , income , income_ver , dti , dti_joint , credit_util , bankruptcies , loan_term, issued_month , inquiries , disbursement_method, grade , loan_purpose)|>
+  arrange(desc(rate))|>
+  as.data.frame()
+
+loans
+
+### VIEW OUTPUT ###
+
+```
+
+Since this first question has multiple parts, I will provide "checks" for you to verify your work.
+
+Check: Run the code chunk below to see if the columns of the first three rows of your dataframe match this output: 
+```         
+ rate     income  dti     issued_month     loan_term    bankruptcies   grade
+ <dbl>    <dbl>  <dbl>    <chr>            <dbl>        <dbl>          <chr>
+1  30.94  83000  16.98    Mar-2018            36            0           G    
+2  30.79  95731  19.64    Jan-2018            60            0           G    
+3  30.79  50000  23.97    Feb-2018            60            0           G  
+```
+
+```{r}
+### CHECK after Q1A ###
+loans[(1:3),c("rate", "income", "dti", "issued_month", "loan_term", "bankruptcies", "grade")]
+```
+
+
+### Q1B Explore the loans dataset, noting in particular any variables with NAs.
+
+```{r}
+
+summary(loans)
+
+```
+
+### Q1C The bank has asked you to store a separate dataframe of all the borrowers who have missing debt-to-income ratios, so that a different analyst can do a further investigation. Using the original `loans_raw` data frame, store only the rows with NAs in the debt-to-income ratio column in a new data frame called `loans_no_dti`.
+
+-   We will *not* use this dataframe in later questions.
+
+Check: The first 6 columns in the first three rows should be the following:
+
+```         
+emp_title   emp_length   state      homeownership   annual_income     verified_income
+<chr>       <dbl>       <chr>       <chr>           <dbl>             <chr> 
+NA          NA          AZ          RENT              0                 Not Verified    
+NA          NA          IN          RENT              0                 Not Verified    
+NA          NA          OK          MORTGAGE          0                 Not Verified    
+```
+
+```{r}
+loans_no_dti <- loans_raw|>
+  filter(is.na(debt_to_income))|>
+  as.data.frame()
+loans_no_dti
+```
+
+### Q1D After a conversation with another analyst, you both determine that it is appropriate to replace the NAs in the debt-to-income column with values from the debt-to-income-joint column in the `loans` dataframe. Store the resulting dataframe as `loans_no_na`, and then remove the debt-to-income-joint variable, which will no longer be needed.
+
+Check: The debt-to-income summary should be the following: (Note there are no longer any NAs)
+
+```         
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   0.00   11.06   17.57   19.30   25.01  469.09
+```
+
+```{r}
+loans_no_na <- loans |>
+  mutate(dti = ifelse(is.na(dti) , dti_joint, dti))|>
+  mutate(dti_joint=NULL)|>
+  as.data.frame()
+#loans_no_na
+summary(loans_no_na$dti)
+
+```
+
+### Q1E After discussing possible important predictors in the models you plan to create, you and the data team determine to make the following transformations to the `loans_no_na` dataframe and store the resulting dataframe as `loans_clean`.
+
+1)  The `issued_month` column contains the month and year that the individual received their loan. Pull out the month and overwrite the contents of the `issued_month` column.
+
+2)  Create a new column named `term_60` which stores a 1 if the term of the loan is 60 months; otherwise, 0.
+
+3)  Create a new column name `purp_debt_consol` which stores a 1 if the purpose of the loan was debt consolidation; otherwise, 0.
+
+4)  Create a new column name `purp_credit_card` which stores a 1 if the purpose of the loan was to pay off a credit card; otherwise, 0.
+
+5)  Create a new column named `purp_home_improve`, which stores a 1 if the purpose of the loan was home improvement; otherwise, 0.
+
+6)  Create a new column name `purp_medical` which stores a 1 if the purpose of the loan was to pay off medical debt; otherwise, 0.
+
+7) Create a new column named `disburse_method`, which stores a 1 if the disbursement method was cash; otherwise, 0.
+
+8)  Remove the following columns from the dataframe, after all transformations are complete: `loan_purpose`, `loan_term`, and `disbursement_method`.
+
+9)  Make sure that all binary encoded variables are factors, not character data, including `grade`.
+
+10)  After you complete all the above transformations, save the data frame as `loans_clean`.
+
+
+```{r}
+loans_clean <-loans_no_na|>
+  mutate(issued_month = substr(issued_month,1,3))|>
+  as.data.frame()
+
+loans_clean <-loans_clean|>
+  mutate(term_60 = as.factor(ifelse(loan_term == 60, 1, 0)))|>
+  mutate(purp_debt_consol = as.factor(ifelse(loan_purpose == 'debt_consolidation', 1, 0)))|>
+  mutate(purp_credit_card = as.factor(ifelse(loan_purpose == 'credit_card', 1, 0)))|>
+  mutate(purp_home_improve = as.factor(ifelse(loan_purpose == 'home_improvement', 1, 0)))|>
+  mutate(purp_medical = as.factor(ifelse(loan_purpose == 'medical', 1, 0)))|>
+  mutate(disburse_method = as.factor(ifelse(disbursement_method == 'Cash', 1, 0)))|>
+  mutate(loan_purpose=NULL,loan_term=NULL,disbursement_method=NULL  )|>
+  mutate(grade=as.factor(grade))|>
+  as.data.frame()
+
+loans_clean
+```
+
+Check: The last 5 columns (11th through 15th) of the 500th and 10,000th rows should be
+
+```         
+purp_debt_consol    purp_credit_card    purp_home_improve   purp_medical    disburse_method
+<fctr>              <fctr>              <fctr>              <fctr>          <fctr>
+0                    1                   0                       0          1
+1                    0                   0                       0          1
+```
+
+```{r}
+### CHECK the last 5 columns of the 500th and 1000th rows###
+loans_clean[c(500, 10000), 11:15]
+```
+
+### Q1F Perform an 80-20 train-test split on the `loans_clean` dataframe. Set the random seed with 25. Store the training data in `train_set` and the test data in `test_set.` Store a summary of the `rate` variable from the training set data as Q1.
+
+Note: If you use a different random seed, you will get different values!
+
+-   In the Console Window the output should look something like this:
+
+```         
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   5.31 [value] [value] [value] [value] [value] 
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q1 # 
+
+### TYPE YOUR CODE BELOW ###
+
+set.seed(25)  # For reproducibility
+
+# Number of observations in dataset
+n <- dim(loans_clean)[1]
+
+# Split data with 80% training
+train_indices <- sample(1:n, size = 0.8 * n)
+
+# Create training set and test set
+train_set <- loans_clean[train_indices, ]
+test_set <- loans_clean[-train_indices, ]
+
+Q1<- summary(train_set$rate)
+
+
+### VIEW OUTPUT ###
+Q1
+
+```
+
+### Q2 The lead data analyst recommends that you compare correlation matrices for train set and test set to make sure they should be roughly the same. Store the correlation matrix from the training set data in Q2. Round to two decimal places.
+
+-   Be sure to match the order of the columns shown below.
+
+-   In the Console Window the output should look something like this:
+
+```         
+                rate  income     dti credit_util bankruptcies inquiries
+rate         [value] [value] [value]     [value]      [value]   [value]
+income         -0.10 [value] [value]     [value]      [value]   [value]
+dti          [value] [value] [value]     [value]      [value]      0.03
+credit_util  [value] [value] [value]     [value]      [value]   [value]
+bankruptcies [value] [value] [value]     [value]      [value]   [value]
+inquiries    [value] [value] [value]        0.12      [value]   [value]
+```
+
+```{r}
+### You can use this block for the correlation matrices
+
+Q2a <- round(cor(test_set[,c("rate" , "income"  , "dti",  "credit_util", "bankruptcies", "inquiries")]),2)
+
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q2 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q2 <- round(cor(train_set[,c("rate" , "income"  , "dti",  "credit_util", "bankruptcies", "inquiries")]),2)
+
+
+
+### VIEW OUTPUT ###
+
+Q2
+```
+
+### Q3 The lead data analyst wants you to compare the following four regression models using the training set data. Create each model and perform diagnostics to assess the model's fit.
+
+#### Model 1: Predict interest rate from income, whether the length of the loan was 60 months, how much credit the individual was utilizing, and two interactions: one between the individual's income and credit utilized and one between the individual's income and whether the length of the loan was 60 months.
+
+-   You can ignore the message: "there are higher-order terms (interactions) in this model consider setting type = 'predictor'; see ?vif"
+
+```{r}
+#train_set
+model1 <- lm( rate ~ income + term_60 + credit_util + income * credit_util + income * term_60 , data= train_set)
+
+```
+
+#### Model 2: Predict interest rate from grade and the month the loan was issued.
+
+```{r}
+model2 <- lm( rate ~ grade + issued_month , data= train_set)
+```
+
+#### Model 3: Predict interest rate from grade alone.
+
+```{r}
+model3 <- lm( rate ~ grade , data= train_set)
+
+```
+
+#### Model 4: Predict interest rate from the individual's debt-to-income ratio, the number of inquiries on the individual, whether the purpose of the loan was paying credit card debt, and whether the purpose of the loan was debt consolidation.
+
+```{r}
+
+model4 <- lm( rate ~ dti + inquiries + purp_credit_card + purp_debt_consol, data= train_set)
+
+```
+
+#### Model Comparison and Selection: The lead data analyst loves comparing AIC with BIC, so you were asked to provide both, along with adjusted r-squared, in order to compare and select the best model at predicting interest rate.
+
+-   Select the model with the best AIC, BIC, and adjusted R-squared. Store these three values in Q3.
+-   Use `paste()` to concatenate these diagnostics into one vector, in the order above.
+-   Round both AIC and BIC to 0 decimal places and r-sq(adj) to 3 decimal places; we'll do this to avoid seeing the results in scientific notation.
+
+-   In the Console Window the output should look something like this:
+
+```         
+[1] "[value] 24226 [value]"
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q3 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q3 <- paste(round(AIC(model3),0),round(BIC(model3),0),round(summary(model3)$r.squared,3 ))
+### VIEW OUTPUT ###
+
+Q3
+```
+
+### Q4 How well does the model chosen in Q3 perform on unseen data (i.e., the test set)? Calculate the adjusted R-squared using the model chosen above, its predictions from the test set, and the loan rates.
+
+-   Store the adjusted R-squared in Q4, rounded to three decimal places.
+
+-   In the Console Window the output should look something like this:
+
+```         
+[1] [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q4 # 
+
+### TYPE YOUR CODE BELOW ###
+
+predictions <- predict(model3, newdata = test_set)
+r_squared <- cor(test_set$rate, predictions)^2
+Q4 <- round(r_squared,3)
+### VIEW OUTPUT ###
+Q4
+```
+
+### Q5A Another analyst on the team wonders if certain predictors (income, debt-to-income ratio, or credit utilization) may be candidates for a polynomial regression model to help predict interest rate. The analyst recommends that you create visualizations to help you determine which of those three predictors is most *non-linear*. Determine which variable appears to be the most non-linear and move on to Q5B.
+
+-   Use the training data set.
+
+```{r}
+# Visualizations
+
+# income
+train_set |> ggplot() +
+  aes(x = income, y = rate) +
+  geom_point() +
+  geom_smooth(method = "loess", formula = "y ~ x", se = FALSE) 
+
+# dti
+train_set |> ggplot() +
+  aes(x = dti, y = rate) +
+  geom_point() +
+  geom_smooth(method = "loess", formula = "y ~ x", se = FALSE) 
+
+# credit_util
+train_set |> ggplot() +
+  aes(x = credit_util, y = rate) +
+  geom_point() +
+  geom_smooth(method = "loess", formula = "y ~ x", se = FALSE) 
+```
+
+### Q5B Now that you've visualized the models and you've chosen which is the most non-linear with interest rate in Q5A, you're wondering what type of polynomial regression term to use, since the shape isn't really parabolic (i.e., not quadratic `y = x^2`). The lead analyst recommends trying a 4th degree polynomial regression term (aka, a quartic term, `y = x^4`). Add the quartic regression term to the model you chose in Q3, and store this new model's AIC, BIC, and adjusted R-squared in Q5. Round adjusted r-squared to three decimal places.
+
+-   Use the training data set.
+-   Use `paste()` to concatenate these diagnostics into one vector, in the order above.
+-   You may notice that one model performs better based on AIC, but the other model performs better based on BIC. Why do you think that is?
+-   Generalized Additive Models (GAMs) or splines may work better, but are beyond the scope of this course.
+
+-   In the Console Window the output should look something like this:
+
+```         
+[1] "[value] 24233.566 [value]"
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q5 # 
+
+### TYPE YOUR CODE BELOW ###
+
+train_set_adj <- train_set |>
+mutate(dti4 = dti^4) |>
+  mutate(income2 = income^2) |>
+  as.data.frame()
+
+
+#train_set_adj
+
+model_5 <- lm( rate ~  grade + dti4 , data= train_set_adj)
+
+
+
+#model3_adj <- lm( rate ~  grade4, data= train_set_adj)
+
+#Q5<- cat(round(AIC(model3_adj),0),round(BIC(model3_adj),0),round(summary(model3_adj)$r.squared,3 ))
+Q5 <- paste(round(AIC(model_5),3),round(BIC(model_5),3),round(summary(model_5)$r.squared,3 ))
+
+
+### VIEW OUTPUT ###
+Q5
+```
+
+### Q6 The Chief Data Officer (CDO) appreciates the work you've done. The CDO recommends running a stepwise regression predicting interest rate against all possible predictors in the `train_set`. Create a multiple regression based on the recommended predictors, and store the generalized variance inflation factors of the predictors in Q6.
+
+-   Stepwise parameters: Use the p-value as the diagnostic to determine if a variable should be added or removed from the model. Set p-value = 0.30 as the threshold for predictors to enter the model and a p-value = 0.01 to remove predictors from the model.
+-   Use the training data set.
+-   Do these GVIF values indicate any multicollinearity?
+
+-   In the Console Window the output should look something like this:
+
+```         
+                     GVIF       Df GVIF^(1/(2*Df))
+grade              [value]       6         [value]
+disburse_method    [value] [value]         [value]
+dti                [value] [value]         [value]
+term_60           1.180782 [value]         [value]
+purp_home_improve  [value] [value]         [value]
+inquiries          [value] [value]         [value]
+income_ver         [value] [value]         [value]
+income             [value]       1        1.032591
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q6 # 
+#train_set
+### TYPE YOUR CODE BELOW ###
+modelAll <- lm( rate ~ grade + disburse_method + dti + term_60 + purp_home_improve + inquiries + income_ver + income   , data = train_set)
+
+#step(modelAll, direction = "both")
+ols_step_both_adj_r2(model = modelAll, 
+                 p_enter = 0.30,      # pent
+                 p_remove = 0.01,    # prem
+                 progress = FALSE,
+                 details = FALSE)
+
+Q6<- vif(modelAll)
+
+### VIEW OUTPUT ###
+Q6
+```
+
+### Q7 As often happens, while you're in the middle of working on one regression, another request comes in! A manager wants to know if the interest rate of a loan could predict if the loan was taken out for purpose of paying credit card debt. In order to communicate the results to the non-technical manager, you decide to use the model to compare hypothetical individuals with interest rates of 5, 10, 15, 20, and 25 percent with the probability that they have the loan due to paying credit card debt. Use the model to find those probabilities, and store them in Q7, rounded to 3 decimal places.
+
+-   Use the training data set.
+
+-   In the Console Window the output should look something like this:
+
+```         
+      1       2       3       4       5 
+[value] [value]   0.197 [value] [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q7 # 
+
+### TYPE YOUR CODE BELOW ###
+
+model4 <- glm(purp_credit_card ~ rate, binomial(), train_set)
+
+summary(model4)
+new.data <- data.frame(rate = c(5,10,15,20,25))
+
+Q7<-round(predict(model4, type = "response",
+        newdata = new.data),3)
+
+### VIEW OUTPUT ###
+
+Q7
+```
+
+### Q8 In the meeting discussing your findings, the manager wonders if certain variables could predict an individual's loan grade. To investigate, create a multinomial logistic regression model, predicting the grade of an applicant based on whether the loan's term was 60 months, the individual's income, and their debt-to-income ratio. Use the model to predict the probabilities for each grade class for the following three individuals, and store the predictions in Q8, rounded to 4 decimal places.
+
+Person 1: Term length: 60 months, income: \$80,000, debt-to-income ratio: 15 Person 2: Term length: 60 months, income: \$150,000, debt-to-income ratio: 5 Person 3: Term length: 36 months, income: \$40,000, debt-to-income ratio: 25
+
+-   Use the `nnet::multinom` function, instead of `glm()`.
+-   Use the documentation for \`nnet::multinom\`\` for further assistance.
+-   In the `predict()` function, use `type = "probs"`.
+-   Round probabilities to 4 decimal places.
+
+-   In the Console Window the output should look something like this:
+
+```         
+        A       B       C       D       E       F       G
+1  0.0482 [value] [value] [value] [value] [value] [value]
+2 [value] [value] [value]  0.1899 [value] [value] [value]
+3 [value] [value] [value] [value] [value] [value] 0.0002
+```
+
+-   Note: you may see additional output as a result of the multinom() function. CodeGrade will only grade what gets assigned to Q8.
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q8 # 
+
+### TYPE YOUR CODE BELOW ###
+
+model5 <- multinom(grade ~ term_60 + income + dti , train_set)
+
+#summary(model5)
+new.data <- data.frame(term_60 = c('1','1','0'), income =c(80000,150000,40000), dti=c(15,5,25))
+
+Q8<-round(predict(model5, type='probs', newdata = new.data),4)
+
+
+### VIEW OUTPUT ###
+
+Q8
+```
+
+
+------------------------------------------------------------------------
+
+# Before submitting to Code Grade:
+
+1)  Clear objects from your environment. Click the broom in the Environment pane in the top right. This will erase any variables (like Q1, Q2) that you've stored.
+
+2)  Rerun all your code. You can click the "Run" option above in this script pane (top right of notebook), then select "Run all". You should have all the variables stored again in the environment pane, and you should see no red error messages in the console below.
+
+------------------------------------------------------------------------
+
+This material is for enrolled students' academic use only and protected under U.S. Copyright Laws. This content must not be shared outside the confines of this course, in line with Eastern University's academic integrity policies. Unauthorized reproduction, distribution, or transmission of this material, including but not limited to posting on third-party platforms like GitHub, is strictly prohibited and may lead to disciplinary action. You may not alter or remove any copyright or other notice from copies of any content taken from Brightspace or Eastern University's website.
+
+© Copyright Notice 2024, Eastern University - All Rights Reserved

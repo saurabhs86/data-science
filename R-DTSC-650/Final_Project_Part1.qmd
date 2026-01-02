@@ -1,0 +1,581 @@
+---
+title: 'DTSC 650: Data Analytics In R'
+subtitle: 'CodeGrade Final Project Part 1'
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+---
+
+## Student Info
+
+```         
+Name: 
+Term: 
+Date:
+```
+
+------------------------------------------------------------------------
+
+## General Instructions
+
+------------------------------------------------------------------------
+
+### Academic Integrity
+
+We expect all work conducted at Eastern University to reflect honest and ethical behavior. The primary rule for ensuring academic integrity is that all submitted work must be original and produced by the individual student.
+
+To uphold academic integrity, it is not permitted to view another student's work prior to submitting your own, nor should you provide your work to someone who has not yet submitted their work. Collaborating with other students is only allowed when seeking clarification on a topic or assignment instructions. Collaborating on quizzes and exams is no permitted.
+
+See the syllabus for more information.
+
+------------------------------------------------------------------------
+
+### Name of File
+
+Name your assignment file **`Final_Project_Part1.qmd`**. This is a Quarto "markdown" file, which has the file has the extension '.qmd'.
+
+------------------------------------------------------------------------
+
+### Allowable packages
+
+On this part of the project, the only allowable packages are `tidyverse`, `psych` and `lm.beta`. You should not use any other packages on this part because CodeGrade is not set up to accept them.
+
+-   If the allowable packages are not installed on your local computer, you'll need to do a one-time installation *from the Console Window in RStudio* for each package like this:
+
+**`install.packages('<package name>')`**
+
+*Do not attempt to install packages in code that you submit to CodeGrade.* CodeGrade will crash if you do so.
+
+------------------------------------------------------------------------
+
+### Do / Do not
+
+-   Do use tidyverse functions for all of the questions where possible.
+
+-   Do use comments in your code and written descriptions outside the code chunks to remind yourself of what you've tried or ideas you have.
+
+-   Do not use the `print()` function anywhere in the notebook. If you do this while working on the project, please be sure to comment those lines out before submitting.
+
+-   Do not rearrange dataframe outputs unless specified by the question instructions.
+
+-   Do not create multiple copies of the BRFSS dataset in your notebook. Creating too many copies of the dataset can cause CodeGrade to crash.
+
+------------------------------------------------------------------------
+
+### Data Set
+
+-   These data come from the [Centers for Disease Control and Prevention](www.cdc.gov)
+
+-   To answer these questions you will need to use the codebook on Brightspace, called `BRFSS_2021 Codebook`. For part 2 of the project, please note that not all of the variables listed in the codebook are included in the .csv file to be downloaded from Brightspace.
+
+-   Download the `brfss2021.csv` file from Brightspace and place it in the same folder/directory as your script file. Then in RStudio, set your Working Directory to your Source File location: in the menus choose Session \| Set Working Directory \| To Source File Location. You most likely will see some warnings after it loads due to the fact that `read_csv()` will try to guess the column type but because there are so many rows it won't read enough of them to accurately make a guess.
+
+-   You must use the `read_csv()` function when loading the .csv file. Do not use read.csv().
+
+-   Do not rename the .csv file that you download from Brightspace.
+
+-   Do not edit the .csv file.
+
+------------------------------------------------------------------------
+
+### Pipe Notation
+
+You may use the `tidyverse` pipe **`%>%`** or the new base R pipe **`|>`**. For a comparison, see [here](https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/).
+
+You are expected to use pipe notation in all of the CodeGrade assignments. Although there are alternate ways to filter, subset, and summarize data sets, using the pipe creates more readable code and is an important skill to develop.
+
+------------------------------------------------------------------------
+
+### Rounding requirement
+
+Round all float/dbl values to two decimal places, unless otherwise noted.
+
+------------------------------------------------------------------------
+
+### Dataframe vs. Tibble
+
+Typically, in CodeGrade assignments, we expect output to be dataframes, not tibbles, unless otherwise noted.
+
+------------------------------------------------------------------------
+
+### Preliminaries
+
+```{r}
+### Run this cell. Do not make any changes.
+
+rm(list = ls())
+
+library(tidyverse) 
+library(psych)
+library(lm.beta)
+
+# This will take a few moments to load since the file is so large.
+
+brf <- read_csv("brfss2021.csv", show_col_types = FALSE)
+```
+
+------------------------------------------------------------------------
+
+## Questions
+
+------------------------------------------------------------------------
+
+### Q1: We will be analyzing three variables (described below) in part 1 of this project. Identify the names of the variables indicated below using the CodeBook provided on Brightspace. Using the brfss2021.csv data provided on Brightspace, create a dataframe named `brf_Q1` with only three columns (in the order listed below). Do not rename the variables. Store the first 10 rows in `Q1`.
+
+-   a variable that measures how often the respondent eats fruit (not including juices).
+
+-   a variable that records the length of time since last routine medical checkup
+
+-   a variable that records the general health of the respondent.
+
+We encourage you to explore both the Codebook and the Questionnaire on Brightspace and take note of the values of each of these three variables and familiarize yourself with them before continuing.
+
+Note: Your `brf_Q1` dataframe should have the same number of rows as the original `brf` but now only 3 columns.
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q1 # 
+
+### TYPE YOUR CODE BELOW ###
+
+brf_Q1 <- brf |>
+  select(FRUIT2,CHECKUP1,GENHLTH)|>
+  as.data.frame()
+
+brf_Q1
+
+Q1 <- brf_Q1|>
+  head(10)|>
+  as.data.frame()
+
+### VIEW OUTPUT ###
+Q1
+```
+
+### Q2: Clean the dataframe `brf_Q1` by removing the respondents who "refused", said "don't know/not sure" and any NAs from both the health variable and the length of time variable. See the CodeBook for details on what the values of the variables mean. Sort the cleaned dataframe by the general health variable (from excellent health to poor health) and store it in a new dataframe named `brf_Q2` (we'll use this later). Assign the first 10 rows of `brf_Q2` to `Q2`.
+
+Hint: The resulting `brf_Q2` dataframe is 431,750 x 3.
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q2 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+brf_Q2 <- brf_Q1 |>
+  filter(!is.na(GENHLTH),!GENHLTH %in% c(7,9))|>
+  filter(!is.na(CHECKUP1),!CHECKUP1 %in% c(7,9))|>
+  arrange(GENHLTH)|>
+  as.data.frame()
+  
+brf_Q2
+Q2 <-brf_Q2 |>
+    head(10)
+
+### VIEW OUTPUT ###
+Q2
+```
+
+### Q3: How many people (and what percentage) reported that, in general, their health is either good or very good? Your answer should be a dataframe with two values: the number and the percentage. Round the percentage to the nearest tenth. Store it as `Q3`.
+
+The percentage is out of the total number of observations for the `brf_Q2` dataset.
+
+Hint: The answer should look like this (note the column names):
+
+```         
+Count       Percent
+<value>     <value> 
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q3 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+Q3 <- brf_Q2|>
+  filter(GENHLTH==2 | GENHLTH==3)|>
+  #group_by(GENHLTH)|>
+  summarise(Count=n(), Percent=round((n()/nrow(brf_Q2)*100),2))|>
+  select(Count, Percent)|>
+  as.data.frame()
+
+
+### VIEW OUTPUT ###
+Q3
+
+```
+
+### Q4: Create a dataframe showing the number and the proportion of individuals who said their health is excellent, very good or good for each of the different lengths of times since last checkup. Store as a dataframe named `Q4`. Round to three decimal places.
+
+The percentage is out of the total number of observations for the `brf_Q2` dataset. If your proportion does not match below, double check your Q2 cleaning.
+
+Hint: The 5x3 dataframe should look like this. The `[...]` is the name of the length of time variable. Be sure to match the column names.
+
+```         
+[...]       n        proportion
+1           <value>   <value>
+2           <value>   <value>
+3           <value>   <value>
+4           <value>   0.038
+8           <value>   <value>
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q4 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+Q4 <- brf_Q2|>
+  filter(GENHLTH==2 | GENHLTH==3 | GENHLTH==1)|>
+  group_by(CHECKUP1)|>
+  summarise(n=n() ,proportion=round((n()/nrow(brf_Q2)),3))|>
+  as.data.frame()
+
+
+
+### VIEW OUTPUT ###
+Q4
+
+```
+
+### Q5: Now we will clean the variable that measures how often the respondent ate fruit per day or per week or per month. Create a new dataframe named `brf_Q5` based on `brf_Q2` with a new column named `FRTDAY` that converts all of the responses into fruits eaten *per day*. Place the new column as the first column in the dataframe. Be sure to account for 0 days. Use 30 days per month and 7 days per week in your conversion calculations and use 0.02 for the value that represents "less than once a month".
+
+-   Remove the respondents who said "don't know/not sure" or refused to respond.
+
+-   Drop the original fruit variable from the `brf_Q5` dataframe (but keep FRTDAY).
+
+-   Be sure to round any conversion calculations to two decimal places.
+
+-   FRTDAY should still contain "Not asked or Missing" values. We will handle those responses later.
+
+-   Sort `brf_Q5` by the general health variable (from excellent health to poor health) and assign the first 10 rows to `Q5`.
+
+-   Select values for rows 3, 65, 114, 120, 365 are shown below.
+
+```         
+    FRTDAY   [name]   [name]
+3     2.00        2       1
+65      NA        2       1
+114   0.43        1       1
+120   0.13        2       1
+365   1.00        1       1
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q5 # 
+
+### TYPE YOUR CODE BELOW ###
+
+brf_Q5 <- brf_Q2|>
+  filter(!FRUIT2 %in% c(777,999))|>
+  mutate(FRTDAY=case_when(
+                FRUIT2 >=101 & FRUIT2 <=199 ~ round(FRUIT2%%100,2),
+                FRUIT2 >=201 & FRUIT2 <=299 ~ round((FRUIT2%%200)/7,2),
+                FRUIT2 ==300 ~ 0.02,
+                FRUIT2 >=301 & FRUIT2 <=399 ~ round((FRUIT2%%300)/30,2),
+                FRUIT2 ==555 ~ 0.00,
+                TRUE ~ FRUIT2
+         
+            )
+        )|>
+  select(FRTDAY,CHECKUP1,GENHLTH)|>
+  arrange(GENHLTH)|>
+  as.data.frame()
+
+brf_Q5[c(3,65,114,120,365),]
+
+Q5 <-brf_Q5 |>
+  head(10)|>
+  as.data.frame()
+  
+
+### VIEW OUTPUT ###
+Q5
+
+```
+
+### Q6 Using the `brf_Q5` dataframe, create a 5 x 5 dataframe with the mean, median, standard deviation, and count of FRTDAY split by the general health of the respondent. Store the result as `Q6.`
+
+Hint: The resulting 5 x 5 dataframe should look like this. The `[...]` is the name of the health variable. Be sure to match the column names.
+
+```         
+[...]   Mean        Median        SD        Count
+1       <value>     <value>       5.20      <value>
+2       <value>     <value>       <value>   <value>
+3       1.27        <value>       <value>   <value>
+4       <value>     <value>       <value>   <value>
+5       <value>     <value>       <value>   17085
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q6 # 
+
+### TYPE YOUR CODE BELOW ###
+Q6 <- brf_Q5|>
+  select(FRTDAY,GENHLTH)|>
+  group_by(GENHLTH)|>
+  summarise(Mean=round(mean(FRTDAY,na.rm = TRUE),2),
+            Median=round(median(FRTDAY,na.rm = TRUE),2),
+            SD=round(sd(FRTDAY,na.rm = TRUE),2),
+            Count=n())|>
+  as.data.frame()
+
+
+
+### VIEW OUTPUT ###
+Q6
+
+```
+
+### Q7: After a visual analysis of the FRTDAY variable in the `brf_Q5` dataframe, an analyst recommends removing all values more than 8 as "outliers". This isn't following a specific outlier rule, but a decision based on the graphical display and the amount of observations lost by using this cut-off. The graded question is part (c) below, but we have included parts (a) and (b) to illustrate some of the analyst's work.
+
+#### a) <Optional> Create a boxplot of the FRTDAY variable (not scored by CG).
+
+```{r}
+
+brf_Q5 |> 
+  ggplot(
+    mapping = aes(x = FRTDAY
+                )) +
+  geom_boxplot()
+
+```
+
+#### b) <Optional> Count how many values will be lost if all values of FRTDAY that are greater than 8 are removed. What proportion of observations will be lost by this removal? (not scored by CG) The resulting boxplot will still have outliers, but not as extreme.
+
+```{r}
+brf_Q5 |>
+  filter(FRTDAY <=8)|>
+  ggplot(
+    mapping = aes(x = FRTDAY
+                )) +
+  geom_boxplot()
+
+
+```
+
+#### c) Create a new dataframe named `brf_Q7c` based on `brf_Q5` that follows the analyst's recommendation.
+
+Hint 1: The resulting dataframe is 420,720 x 3.
+
+Hint 2: Check that NAs still exist in the FRTDAY variable.
+
+```{r}
+
+brf_Q7c <- brf_Q5 |>
+  filter(FRTDAY <= 8 | is.na(FRTDAY) )|>
+  as.data.frame()
+
+brf_Q7c
+  
+```
+
+#### d) Finally, create a new dataframe named `brf_Q7` from `brf_Q7c` that imputes the median number of fruits per day to the "not asked or missing" values. With the new `brf_Q7` dataframe, use `describe` from the `Psych` package to output statistics from each variable. Store as `Q7.`
+
+The summary output is a 3 x 13 dataframe. The first few columns look like this:
+
+```         
+          vars    n         mean    sd            ...   ...
+FRTDAY    1       420720    1.04    <value>       ...   ...
+<name>    2       420720    <value> <value>       ...   ...
+<name>    3       420720    <value> <value>       ...   ...
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q7 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+brf_Q7 <- brf_Q7c|>
+   mutate(FRTDAY=replace_na(FRTDAY, median(FRTDAY, na.rm = TRUE)))|>
+   #mutate(CHECKUP1=as.factor(CHECKUP1))|>
+   as.data.frame()
+brf_Q7
+
+#Q7 <- describeBy(brf_Q7 ) 
+Q7 <- describe(brf_Q7 ) 
+### VIEW OUTPUT ###
+Q7
+```
+
+### Q8: Using the `brf_Q7` dataframe create a regression predicting general health based on both number of fruits consumed per day and the length of time since last checkup (in that order). Analyze the summary of the model. How would you assess this model? Store the summary of the standardized regression coefficients in `Q8.`
+
+Hint: Keep in mind what type of data each variable is and how we do regression with that type of data.
+
+Hint: The resulting summary output should look like this:
+
+```         
+Call:
+[...]
+
+Residuals:
+    Min      1Q     Median      3Q        Max 
+<value>    <value>   <value>    <value>  <value> 
+
+Coefficients:
+             Estimate Standardized Std. Error t value Pr(>|t|)    
+(Intercept)  2.672440  <value>   <value> <value>  <value>
+FRTDAY      -0.107117  <value>   <value> <value>  <value>
+[...]2      <value>    <value>   <value> <value>  <value>
+[...]3      <value>    <value>   <value> <value>  <value>
+[...]4      <value>    <value>   <value> <value>  <value>
+[...]8      <value>    <value>   <value> <value>  <value>
+
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: <value> on <value> degrees of freedom
+Multiple R-squared:  <value>,   Adjusted R-squared:  <value> 
+F-statistic:  <value> on <value> and <value> DF,  p-value: < <value>
+```
+
+```{r}
+
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q8 # 
+
+### TYPE YOUR CODE BELOW ###
+
+#find unique values
+unique(brf_Q7$CHECKUP1)
+
+#Use dummy encoding for CHECKUP1
+catColumns <- c("CHECKUP1")
+
+brf_Q7Encoded <- brf_Q7 |>
+  mutate(CHECKUP1_2 = if_else(CHECKUP1 == "2", 1, 0)) |>
+  mutate(CHECKUP1_3 = if_else(CHECKUP1 == "3", 1, 0)) |>
+  mutate(CHECKUP1_4 = if_else(CHECKUP1 == "4", 1, 0)) |>
+  mutate(CHECKUP1_8 = if_else(CHECKUP1 == "8", 1, 0))
+
+
+#brf_Q7Encoded
+# remove orignial column 
+
+brf_Q7EncodedClean <- brf_Q7Encoded |> 
+  select(-c(CHECKUP1))
+
+#standardized Coefficients  
+model1=lm(data = brf_Q7EncodedClean ,GENHLTH  ~ .  )
+lm.beta(model1)
+
+Q8<-summary(lm.beta(model1))
+
+
+### VIEW OUTPUT ###
+Q8
+```
+
+### Q9: Create a new dataframe named `brf_Q9` based on `brf_Q7` with two new columns with binary data. For any health level of very good or excellent, set the value to 1; otherwise, a 0. Call this `binHealth`. For any person attending a checkup within the past year, set to a value of 1; otherwise, 0. Call this `binCheckup`. With the updated dataframe, perform a logistic regression to predict an individual's general health being very good or excellent based on `FRTDAY` and `binCheckup`. Store the summary of the regression  in `Q9.`
+
+Hint: Keep in mind what type of data each variable is and how we do regression with that type of data.
+
+Hint: The resulting summary output should look like this:
+
+```         
+Call:
+glm(...)
+    
+Coefficients:
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  <value>    <value>   <value>   <value>
+FRTDAY       0.191097   <value>   <value>   <value>
+binCheckup1  <value>    <value>   <value>   <value>
+
+---
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+Null deviance: <value>  on 420719  degrees of freedom
+Residual deviance: <value>  on 420717  degrees of freedom
+AIC: <value>
+
+Number of Fisher Scoring iterations: <value>
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q9 # 
+
+### TYPE YOUR CODE BELOW ###
+
+brf_Q9 <- brf_Q7|>
+        mutate(binHealth=case_when(GENHLTH==1 ~ 1,
+                                   GENHLTH==2 ~ 1,
+                                   TRUE ~ 0),
+               binCheckup=if_else(CHECKUP1==1,1,0)
+               )|> 
+        as.data.frame()
+#brf_Q9
+
+model2 <- glm(binHealth ~ FRTDAY + binCheckup, binomial(), brf_Q9)
+Q9 <-summary(model2)
+### VIEW OUTPUT ###
+Q9
+
+```
+
+### Q10: Create a dataframe with data on five new individuals, shown in the table below. Then use your logistic regression model above and this new data to predict the log-odds of how each individual would respond to whether they are in very good or excellent health. Use the `predict()` function. Round predictions to 2 decimal places. Store the predictions in `Q10`.
+
+| ID      | FRTDAY | binCheckup |
+|---------|--------|------------|
+| Person1 | 0      | 0          |
+| Person2 | 1      | 0          |
+| Person3 | 2      | 0          |
+| Person4 | 3      | 1          |
+| Person5 | 6      | 1          |
+
+Hint: Keep in mind what type of data each variable is and how we do regression with that type of data.
+
+Hint: The prediction output should look like this:
+
+```         
+1       2       3       4       5 
+0.18    <value> <value> <value> <value>
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q10 # 
+
+### TYPE YOUR CODE BELOW ###
+
+new.data <- data.frame(ID=c("Person1","Person2","Person3","Person4","Person5"),FRTDAY=c(0,1,2,3,6),binCheckup=c(0,0,0,1,1))
+#new.data
+
+Q10 <-round(predict(model2,newdata = new.data ),2)
+
+
+
+
+
+### VIEW OUTPUT ###
+Q10
+
+
+```
+
+------------------------------------------------------------------------
+
+# Before submitting to Code Grade:
+
+1)  Clear objects from your environment. Click the broom in the Environment pane in the top right. This will erase any variables (like Q1, Q2) that you've stored.
+
+2)  Rerun all your code. You can click the "Run" option above in this script pane (top right of notebook), then select "Run all". You should have all the variables stored again in the environment pane, and you should see no red error messages in the console below.
+
+------------------------------------------------------------------------
+
+This material is for enrolled students' academic use only and protected under U.S. Copyright Laws. This content must not be shared outside the confines of this course, in line with Eastern University's academic integrity policies. Unauthorized reproduction, distribution, or transmission of this material, including but not limited to posting on third-party platforms like GitHub, is strictly prohibited and may lead to disciplinary action. You may not alter or remove any copyright or other notice from copies of any content taken from Brightspace or Eastern University's website.
+
+© Copyright Notice 2024, Eastern University - All Rights Reserved

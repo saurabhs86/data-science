@@ -1,0 +1,458 @@
+---
+title: 'DTSC 650: Data Analytics In R'
+subtitle: 'CodeGrade Assignments Part 1: msleep'
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+---
+
+## Student Info
+
+```         
+Name: 
+Term: 
+Date:
+```
+
+------------------------------------------------------------------------
+
+## General Instructions
+
+------------------------------------------------------------------------
+
+### Name of File
+
+Name your assignment file **`msleep`**. This is a quarto "markdown" file, which has the file has the extension '.qmd'.
+
+------------------------------------------------------------------------
+
+### Allowable packages
+
+The only allowable package is `tidyverse`. You should not use any other packages as CodeGrade is not set up to accept them on this assignment.
+
+-   If the allowable packages are not installed on your local computer, you'll need to do a one-time installation *from the Console Window in RStudio* for each package like this:\
+    **`install.packages('<package name>')`**\
+    *Do not attempt to install packages in code that you submit to CodeGrade.*
+
+-   Note: installing the entire tidyverse with `install.packages('tidyverse')` from the Console Window will save you from having to install any of the tidyverse's individual packages in the future.
+
+-   In your code, load the package's library like this: **`library(<library name>)`**
+
+------------------------------------------------------------------------
+
+### Data Set
+
+The data set for this assignment is called **`msleep`**. See the [msleep documentation](https://ggplot2.tidyverse.org/reference/msleep.html) for more info.
+
+------------------------------------------------------------------------
+
+### Pipe Notation
+
+You may use the `tidyverse` pipe **`%>%`** or the new base R pipe **`|>`**. See [here](https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/) for a comparison.
+
+You are expected to use pipe notation in all of the CodeGrade assignments. Although there are alternate ways to filter, subset, and summarize data sets, using the pipe creates more readable code and is an important skill to develop.
+
+------------------------------------------------------------------------
+
+### Rounding requirement
+
+-   Round all float/dbl values to two decimal places.
+
+------------------------------------------------------------------------
+
+### Dataframe vs. Tibble
+
+Typically, in CodeGrade assignments, we expect output to be dataframes, not tibbles, unless otherwise noted.
+
+------------------------------------------------------------------------
+
+### Inline vs. Console
+
+By default, RStudio uses Inline output (Notebook mode) on R Markdown documents. You can switch between Inline and Console output modes by clicking the gear button in the editor toolbar (to the left of the green "insert new code chunk") and choosing either "Chunk Output Inline" or "Chunk Output in Console". See [here](https://bookdown.org/yihui/rmarkdown/notebook.html#creating-a-notebook) for more information.
+
+Console output can be useful for debugging since that's how your solutions will appear to CodeGrade. You can type code directly into the Console as well and run it from there. For example: after you run the Q0 example code inline (shown below), you can type `Q0<ENTER>` in the Console to see how the output appears to CodeGrade.
+
+------------------------------------------------------------------------
+
+### Preliminaries
+
+```{r}
+### It's always a good idea when working in RStudio to start with a clean environment. 
+### Clear objects from the environment memory that may be leftover from previous versions of your code or other assignments by running the following line:
+rm(list = ls())
+
+### Load Libraries
+library(tidyverse) 
+
+### There may be warning messages about some of the packages. You can ignore these. Feel free to search online for the explanations for these messages.
+```
+
+### Before attempting the questions below, familiarize yourself with the `msleep` dataset. Run the following block.
+
+```{r}
+msleep
+
+```
+
+### Q0: An Example
+
+Suppose the question is:\
+**Find the median total sleep time for all carnivores by conservation type. Note that conservation has NAs; you should remove them. Include the name of the animal along with its conservation status and median sleep time (named sleep_time_med) in the answer and store it as a data frame. Round the median to two decimal places, and store it in Q0.**
+
+The following code block provides the solution:
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q0 # 
+
+Q0 <- msleep %>%
+  select(name, vore, conservation, sleep_total) %>%
+  filter(vore=="carni", !is.na(conservation)) %>% 
+  group_by(conservation) %>% 
+  summarize(sleep_time_med = round(median(sleep_total, na.rm=TRUE),2)) %>%
+  as.data.frame()
+Q0
+```
+
+For the above code block, run the entire cell with the green arrow on the right.
+
+
+
+We expect your solutions to look like the above code block, where you are using the pipe operator (not other approaches) and, in some cases, finding the solution in just one line of code.
+
+------------------------------------------------------------------------
+
+## Questions
+
+------------------------------------------------------------------------
+
+### Q1 Create a dataframe with only two columns: `name` and `bodywt`.
+
+-   Your solution should be an 83x2 dataframe (83 rows by 2 columns) assigned to Q1. Do not round the `bodywt` column. The output should look something like this:
+
+```         
+             name   bodywt
+1  [value_string]  [value]
+2  [value_string]  [value]
+...   ...           ...
+83 [value_string]  [value]
+```
+
+-   **If** you're up for a challenge, see if you can do it without using a `dplyr` verb. (On the CG assignments in this course, dplyr verbs are expected.)
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q1 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q1 <- msleep |>
+  select(name, bodywt)|>
+  as.data.frame()
+
+
+### VIEW OUTPUT ###
+Q1
+
+```
+
+### Q2 Create a dataframe with only two columns (`name` and `bodywt`) and sort it by `bodywt` (largest to smallest). Do not round the `bodywt` column.
+
+-   Your solution should be a dataframe assigned to Q2. The output should look something like this:
+
+```         
+             name   bodywt
+1  [value_string]  [value]
+2  [value_string]  [value]
+...   ...           ...
+83 [value_string]  [value]
+```
+
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q2 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q2 <- msleep |>
+  select(name, bodywt)|>
+  arrange(desc(bodywt))|>
+  as.data.frame()
+
+### VIEW OUTPUT ###
+Q2
+
+```
+
+### Q3 Which animal has the highest body weight?
+
+-   Your solution should be a dataframe assigned to Q3. The output should look something like this:
+
+```         
+            name
+1 [value_string]
+```
+-   **If** you're up for a challenge, do this with a different function than you just used.
+
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q3 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q3 <- msleep |>
+  select(name, bodywt)|>
+  arrange(desc(bodywt))|>
+  head(1)|>
+  select(name)|>
+  as.data.frame()
+
+### VIEW OUTPUT ###
+Q3
+
+```
+
+### Q4 Which animal has the lowest brain weight?
+
+-   Your solution should be a dataframe assigned to Q4. The output should look something like this:
+
+```         
+            name
+1 [value_string]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q4 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+Q4 <- msleep |>
+  select(name, brainwt)|>
+  arrange((brainwt))|>
+  head(1)|>
+  select(name)|>
+  as.data.frame()
+
+### VIEW OUTPUT ###
+Q4
+
+```
+
+### Q5 Create a 3 column dataframe (`genus`, `name`, and `order`) sorted by `genus` that only lists primates.
+
+-   Your solution should be a dataframe assigned to Q5. The output should look something like this:
+
+```         
+            genus           name          order
+1  [value_string] [value_string] [value_string]
+2  [value_string] [value_string] [value_string]
+...
+12 [value_string] [value_string] [value_string]
+
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q5 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q5 <- msleep |>
+  select(genus, name, order)|>
+  filter(order=='Primates')|>
+  arrange((genus))|>
+  as.data.frame()
+
+
+### VIEW OUTPUT ###
+Q5
+
+```
+
+
+### Q6 What is the variance in total sleep for carnivores whose `conservation` status is `lc`?
+
+-   Your solution should be a dataframe assigned to Q6. The variance column should be named `var`. The output should look something like this:
+
+```         
+      var
+1 [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q6 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q6 <- msleep |>
+  select(sleep_total,vore, order,conservation)|>
+  filter(conservation=='lc')|>
+  filter(vore=='carni')|>
+  group_by(conservation) |>
+  summarise(var=round(var(sleep_total,na.rm = TRUE),2))|>
+  select(var )|>
+  as.data.frame()
+
+
+### VIEW OUTPUT ###
+Q6
+
+```
+
+### Q7 What rodent (order Rodentia) has the highest total sleep to rem sleep ratio?
+
+-   Your solution should be a dataframe assigned to Q7. The output should look something like this:
+
+```         
+           name
+1 [animal name]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q7 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q7 <- msleep |>
+  select(sleep_total,sleep_rem, order,name)|>
+  filter(order=='Rodentia')|>
+  mutate(sleepratio=sleep_total/sleep_rem)|>
+  select(name, sleepratio)|>
+  arrange(desc(sleepratio))|>
+  head(1)|>
+  select(name)|>
+  as.data.frame()
+
+
+
+### VIEW OUTPUT ###
+Q7
+
+```
+
+### Q8 List the name(s) of primates with a bodyweight to brainwt ratio greater than 100?
+
+-   Your solution should be a dataframe assigned to Q8 and look something like this:
+
+```         
+           name
+1 [animal name]
+...
+n [animal name]
+
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q8 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q8 <- msleep |>
+  select(name, bodywt,brainwt,order)|>
+  filter(order=='Primates')|>
+  mutate(ratio=bodywt/brainwt)|>
+  filter(ratio > 100)|>
+  select(name)|>
+  as.data.frame()
+
+
+
+### VIEW OUTPUT ###
+Q8
+
+```
+
+### Q9 Find the mean of sleep total (named `mean_sleep`) and the variance of sleep total (named `var_sleep`) grouped by `conservation` with missing values removed.
+
+-   Your solution should be a dataframe assigned to Q9 and the output should look something like this:
+
+```         
+  conservation mean_sleep var_sleep
+1           cd    [value]   [value]
+2 domesticated    [value]   [value]
+3           en    [value]   [value]
+4           lc    [value]   [value]
+5           nt    [value]   [value]
+6           vu    [value]   [value]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q9 # 
+
+### TYPE YOUR CODE BELOW ###
+
+Q9 <- msleep |>
+  select(conservation, sleep_total)|>
+  filter(conservation != 'NA')|>
+  group_by(conservation) |>
+  summarise(mean_sleep=round(mean(sleep_total,na.rm = TRUE ),2),var_sleep=round(var(sleep_total,na.rm = TRUE),2))|>
+  select(conservation,mean_sleep,var_sleep )|>
+  as.data.frame()
+
+
+
+### VIEW OUTPUT ###
+Q9
+
+```
+
+### Q10 List the name(s) of all the domesticated herbivores that sleep more than 12 hours.
+
+-   Your solution should be a dataframe assigned to Q10 and the output should look something like this:
+
+```         
+           name
+1 [animal name]
+...
+n [animal name]
+```
+
+```{r}
+### Do not edit the following line. It is used by CodeGrade.
+# CG Q10 # 
+
+### TYPE YOUR CODE BELOW ###
+
+
+Q10 <- msleep |>
+  select(name ,sleep_total , vore, conservation)|>
+  filter(vore == 'herbi')|>
+  filter(conservation == 'domesticated')|>
+  filter(conservation == 'domesticated')|>
+  filter(sleep_total > 12)|>
+  select(name)|>
+  as.data.frame()
+
+
+
+### VIEW OUTPUT ###
+Q10
+
+```
+
+------------------------------------------------------------------------
+
+# Before submitting to Code Grade:
+
+1)  Clear objects from your environment. Click the broom in the Environment pane in the top right. This will erase any variables (like Q1, Q2) that you've stored.
+
+2)  Rerun all your code. You can click the "Run" option above in this script pane (top right of notebook), then select "Run all". You should have all the variables stored again in the environment pane, and you should see no red error messages in the console below.
+
+------------------------------------------------------------------------
+
+This material is for enrolled students' academic use only and protected under U.S. Copyright Laws. This content must not be shared outside the confines of this course, in line with Eastern University's academic integrity policies. Unauthorized reproduction, distribution, or transmission of this material, including but not limited to posting on third-party platforms like GitHub, is strictly prohibited and may lead to disciplinary action. You may not alter or remove any copyright or other notice from copies of any content taken from BrightSpace or Eastern University's website.
+
+(c) Copyright Notice 2024, Eastern University - All Rights Reserved
+
+
+
+
+
